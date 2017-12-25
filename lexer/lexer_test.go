@@ -7,7 +7,7 @@ import (
 )
 
 func TestBasicPunctuation(t *testing.T) {
-	input := `=+,;(){}`
+	input := `=+-!*/<>,;(){}`
 
 	expectedTokens := []struct {
 		Type    token.TokenType
@@ -15,6 +15,12 @@ func TestBasicPunctuation(t *testing.T) {
 	}{
 		{token.ASSIGN, "="},
 		{token.PLUS, "+"},
+		{token.MINUS, "-"},
+		{token.BANG, "!"},
+		{token.ASTERISK, "*"},
+		{token.SLASH, "/"},
+		{token.LESS_THAN, "<"},
+		{token.GREATER_THAN, ">"},
 		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
 		{token.LEFT_PAREN, "("},
