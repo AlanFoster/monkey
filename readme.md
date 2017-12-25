@@ -1,6 +1,8 @@
 Monkey
 ======
 
+A Go implementation of the Monkey language as described in https://interpreterbook.com/
+
 ### Testing
 
 ```shell
