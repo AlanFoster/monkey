@@ -44,6 +44,7 @@ func TestBasicPunctuation(t *testing.T) {
 		{token.RIGHT_PAREN, ")"},
 		{token.LEFT_BRACE, "{"},
 		{token.RIGHT_BRACE, "}"},
+		{token.EOF, ""},
 	}
 
 	l := New(input)
@@ -114,6 +115,8 @@ func TestAssignmentAndFunctions(t *testing.T) {
 		{token.COMMA, ","},
 		{token.IDENTIFIER, "ten"},
 		{token.RIGHT_PAREN, ")"},
+
+		{token.EOF, ""},
 	}
 
 	l := New(input)
@@ -165,6 +168,8 @@ func TestBranching(t *testing.T) {
 
 		// }
 		{token.RIGHT_BRACE, "}"},
+
+		{token.EOF, ""},
 	}
 
 	l := New(input)
