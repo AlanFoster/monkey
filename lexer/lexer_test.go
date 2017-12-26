@@ -7,16 +7,33 @@ import (
 )
 
 func TestBasicPunctuation(t *testing.T) {
-	input := `=+-!*/<>,;(){}`
+	input := `
+		=
+		==
+		+
+		-
+		!
+		!=
+		*
+		/
+		<
+		>
+		,
+		;
+		()
+		{}
+	`
 
 	expectedTokens := []struct {
 		Type    token.TokenType
 		Literal string
 	}{
-		{token.ASSIGN, "="},
+		{token.EQ, "="},
+		{token.EQ_EQ, "=="},
 		{token.PLUS, "+"},
 		{token.MINUS, "-"},
 		{token.BANG, "!"},
+		{token.NOT_EQ, "!="},
 		{token.ASTERISK, "*"},
 		{token.SLASH, "/"},
 		{token.LESS_THAN, "<"},
@@ -58,21 +75,21 @@ func TestAssignmentAndFunctions(t *testing.T) {
 		// let five = 5;
 		{token.LET, "let"},
 		{token.IDENTIFIER, "five"},
-		{token.ASSIGN, "="},
+		{token.EQ, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 
 		// let ten = 10;
 		{token.LET, "let"},
 		{token.IDENTIFIER, "ten"},
-		{token.ASSIGN, "="},
+		{token.EQ, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 
 		// let add = fn(x, y) { x + y; };
 		{token.LET, "let"},
 		{token.IDENTIFIER, "add"},
-		{token.ASSIGN, "="},
+		{token.EQ, "="},
 		{token.FUNCTION, "fn"},
 		{token.LEFT_PAREN, "("},
 		{token.IDENTIFIER, "x"},
@@ -90,7 +107,7 @@ func TestAssignmentAndFunctions(t *testing.T) {
 		// let result = add(five, ten)
 		{token.LET, "let"},
 		{token.IDENTIFIER, "result"},
-		{token.ASSIGN, "="},
+		{token.EQ, "="},
 		{token.IDENTIFIER, "add"},
 		{token.LEFT_PAREN, "("},
 		{token.IDENTIFIER, "five"},

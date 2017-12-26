@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/alanfoster/monkey/token"
+import (
+	"github.com/alanfoster/monkey/token"
+)
 
 type Lexer struct {
 	input        string
@@ -33,44 +35,50 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			tok = newStringToken(token.EQ_EQ, l.readTwoCharacterLiteral())
+		} else {
+			tok = newCharToken(token.EQ, l.ch)
+		}
 	case '+':
-		tok = newToken(token.PLUS, l.ch)
+		tok = newCharToken(token.PLUS, l.ch)
 	case '-':
-		tok = newToken(token.MINUS, l.ch)
+		tok = newCharToken(token.MINUS, l.ch)
 	case '!':
-		tok = newToken(token.BANG, l.ch)
+		if l.peekChar() == '=' {
+			tok = newStringToken(token.NOT_EQ, l.readTwoCharacterLiteral())
+		} else {
+			tok = newCharToken(token.BANG, l.ch)
+		}
 	case '*':
-		tok = newToken(token.ASTERISK, l.ch)
+		tok = newCharToken(token.ASTERISK, l.ch)
 	case '/':
-		tok = newToken(token.SLASH, l.ch)
+		tok = newCharToken(token.SLASH, l.ch)
 	case '<':
-		tok = newToken(token.LESS_THAN, l.ch)
+		tok = newCharToken(token.LESS_THAN, l.ch)
 	case '>':
-		tok = newToken(token.GREATER_THAN, l.ch)
+		tok = newCharToken(token.GREATER_THAN, l.ch)
 	case ',':
-		tok = newToken(token.COMMA, l.ch)
+		tok = newCharToken(token.COMMA, l.ch)
 	case ';':
-		tok = newToken(token.SEMICOLON, l.ch)
+		tok = newCharToken(token.SEMICOLON, l.ch)
 	case '(':
-		tok = newToken(token.LEFT_PAREN, l.ch)
+		tok = newCharToken(token.LEFT_PAREN, l.ch)
 	case ')':
-		tok = newToken(token.RIGHT_PAREN, l.ch)
+		tok = newCharToken(token.RIGHT_PAREN, l.ch)
 	case '{':
-		tok = newToken(token.LEFT_BRACE, l.ch)
+		tok = newCharToken(token.LEFT_BRACE, l.ch)
 	case '}':
-		tok = newToken(token.RIGHT_BRACE, l.ch)
+		tok = newCharToken(token.RIGHT_BRACE, l.ch)
 	default:
 		if isIdentifierLetter(l.ch) {
-			tok.Literal = l.readIdentifier()
-			tok.Type = token.LookupIdentifier(tok.Literal)
-			return tok
+			literal := l.readIdentifier()
+			tokenType := token.LookupIdentifier(literal)
+			return newStringToken(tokenType, literal)
 		} else if isDigit(l.ch) {
-			tok.Literal = l.readNumber()
-			tok.Type = token.INT
-			return tok
+			return newStringToken(token.INT, l.readNumber())
 		} else {
-			tok = newToken(token.ILLEGAL, l.ch)
+			tok = newCharToken(token.ILLEGAL, l.ch)
 		}
 	}
 
@@ -98,6 +106,15 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+// Reads a two character literal from the input string. Useful for two character operators
+func (l *Lexer) readTwoCharacterLiteral() string {
+	currentChar := l.ch
+	l.readChar()
+	nextChar := l.ch
+
+	return string(currentChar) + string(nextChar)
+}
+
 // Skips any whitespace
 func (l *Lexer) skipWhitespace() {
 	for isWhitespace(l.ch) {
@@ -105,10 +122,20 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func newToken(tokenType token.TokenType, ch byte) token.Token {
+// Peek at the next character within the input stream without updating the position
+// of the lexer internally
+func (l *Lexer) peekChar() byte {
+	return l.input[l.position+1]
+}
+
+func newCharToken(tokenType token.TokenType, ch byte) token.Token {
+	return newStringToken(tokenType, string(ch))
+}
+
+func newStringToken(tokenType token.TokenType, string string) token.Token {
 	return token.Token{
 		Type:    tokenType,
-		Literal: string(ch),
+		Literal: string,
 	}
 }
 

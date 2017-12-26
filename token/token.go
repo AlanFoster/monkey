@@ -16,10 +16,12 @@ const (
 	INT        = "INT"        // 12345...
 
 	// Operators
-	ASSIGN   = "="
+	EQ       = "="
+	EQ_EQ    = "=="
 	PLUS     = "+"
 	MINUS    = "-"
 	BANG     = "!"
+	NOT_EQ   = "!="
 	ASTERISK = "*"
 	SLASH    = "/"
 
