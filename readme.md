@@ -25,6 +25,13 @@ Feel free to type in commands, for example: 1 + 3
 
 ### Testing
 
+Running all tests
+```shell
+go test ./...
+```
+
+Running a particular folder's tests:
+
 ```shell
 go test ./lexer
 ```
