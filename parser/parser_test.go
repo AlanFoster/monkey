@@ -18,6 +18,7 @@ func TestLetStatements(t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
 	assert.NotNil(t, program)
 	assert.Equal(t, 3, len(program.Statements))
 
@@ -40,4 +41,20 @@ func TestLetStatements(t *testing.T) {
 		assert.Equal(t, expected.identifier, letStmt.Name.TokenLiteral())
 
 	}
+}
+
+func TestInvalidParsing(t *testing.T) {
+	input := `
+		let x 10;
+		let x
+	`
+	l := lexer.New(input)
+	p := New(l)
+
+	p.ParseProgram()
+	expectedErrors := []string{
+		"expected next token to be =, but got {INT 10} instead",
+		"expected next token to be =, but got {EOF } instead",
+	}
+	assert.Equal(t, expectedErrors, p.Errors())
 }
