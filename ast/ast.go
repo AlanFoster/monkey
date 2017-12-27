@@ -1,6 +1,8 @@
 package ast
 
-import "github.com/alanfoster/monkey/token"
+import (
+	"github.com/alanfoster/monkey/token"
+)
 
 type Node interface {
 	// Temporary function only used for debugging and testing
@@ -35,9 +37,7 @@ type LetStatement struct {
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode() {
-
-}
+func (ls *LetStatement) statementNode() {}
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
@@ -52,7 +52,12 @@ func (i *Identifier) TokenLiteral() string {
 	return i.Token.Literal;
 }
 
+type ReturnStatement struct {
+	Token token.Token
+	Value Expression
+}
 
-type Number struct {
-	Expression
+func (rs *ReturnStatement) statementNode() {}
+func (rs *ReturnStatement) TokenLiteral() string {
+	return rs.Token.Literal;
 }
