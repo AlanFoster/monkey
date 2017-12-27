@@ -4,7 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/alanfoster/monkey/lexer"
-	"github.com/alanfoster/monkey/ast"
+	"github.com/bradleyjkemp/cupaloy"
 )
 
 func TestLetStatements(t *testing.T) {
@@ -19,28 +19,8 @@ func TestLetStatements(t *testing.T) {
 
 	program := p.ParseProgram()
 	assert.Empty(t, p.Errors())
-	assert.NotNil(t, program)
-	assert.Equal(t, 3, len(program.Statements))
 
-	expectedStatements := []struct {
-		identifier string
-	}{
-		{"x"},
-		{"y"},
-		{"foobar"},
-	}
-
-	for i, expected := range expectedStatements {
-		stmt := program.Statements[i]
-
-		letStmt, ok := stmt.(*ast.LetStatement)
-		assert.True(t, ok)
-
-		assert.Equal(t, "let", stmt.TokenLiteral())
-		assert.Equal(t, expected.identifier, letStmt.Name.Value)
-		assert.Equal(t, expected.identifier, letStmt.Name.TokenLiteral())
-
-	}
+	cupaloy.SnapshotT(t, program)
 }
 
 func TestInvalidParsing(t *testing.T) {

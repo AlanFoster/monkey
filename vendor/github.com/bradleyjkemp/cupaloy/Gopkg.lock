@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/bradleyjkemp/cupaloy"
-  packages = ["."]
-  revision = "5847e1e3b68235a8f76b8028956f9de0895ae0d2"
-  version = "v1.1.0"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -19,15 +13,9 @@
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
-[[projects]]
-  name = "github.com/stretchr/testify"
-  packages = ["assert"]
-  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
-  version = "v1.1.4"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1d9bc98fc06431606676ac37ec17760ac1847ef7a920e80f9bfd123cbba1598a"
+  inputs-digest = "916990b445ffe6c07389526896c11ea5cdf065b0015a986b000330569340ce1e"
   solver-name = "gps-cdcl"
   solver-version = 1
