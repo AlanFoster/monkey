@@ -71,3 +71,14 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 	cupaloy.SnapshotT(t, program)
 }
+
+func TestParsingPrefixExpression(t *testing.T) {
+	input := `!5; -15;`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+	assert.Len(t, program.Statements, 2)
+
+	cupaloy.SnapshotT(t, program)
+}
