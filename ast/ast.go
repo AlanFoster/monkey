@@ -77,7 +77,7 @@ type Identifier struct {
 
 func (i *Identifier) expressionStatement() {}
 func (i *Identifier) TokenLiteral() string {
-	return i.Token.Literal;
+	return i.Token.Literal
 }
 func (i *Identifier) PrettyPrint() string {
 	return i.Value
@@ -90,7 +90,7 @@ type ReturnStatement struct {
 
 func (rs *ReturnStatement) statementNode() {}
 func (rs *ReturnStatement) TokenLiteral() string {
-	return rs.Token.Literal;
+	return rs.Token.Literal
 }
 
 func (rs *ReturnStatement) PrettyPrint() string {
@@ -112,7 +112,7 @@ type ExpressionStatement struct {
 
 func (es *ExpressionStatement) statementNode() {}
 func (es *ExpressionStatement) TokenLiteral() string {
-	return es.Token.Literal;
+	return es.Token.Literal
 }
 
 func (es *ExpressionStatement) PrettyPrint() string {
@@ -120,4 +120,18 @@ func (es *ExpressionStatement) PrettyPrint() string {
 		return es.Expression.PrettyPrint()
 	}
 	return ""
+}
+
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (il *IntegerLiteral) expressionStatement() {}
+func (il *IntegerLiteral) TokenLiteral() string {
+	return il.Token.Literal
+}
+
+func (il *IntegerLiteral) PrettyPrint() string {
+	return il.Token.Literal
 }

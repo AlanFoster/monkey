@@ -60,3 +60,14 @@ func TestIdentifierExpression(t *testing.T) {
 
 	cupaloy.SnapshotT(t, program)
 }
+
+func TestIntegerLiteralExpression(t *testing.T) {
+	input := `1337;`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+	assert.Len(t, program.Statements, 1)
+
+	cupaloy.SnapshotT(t, program)
+}

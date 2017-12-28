@@ -1,0 +1,17 @@
+(*ast.Program)({
+  Statements: ([]ast.Statement) (len=1) {
+    (*ast.ExpressionStatement)({
+      Token: (token.Token) {
+        Type: (token.TokenType) (len=3) "INT",
+        Literal: (string) (len=4) "1337"
+      },
+      Expression: (*ast.IntegerLiteral)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=3) "INT",
+          Literal: (string) (len=4) "1337"
+        },
+        Value: (int64) 1337
+      })
+    })
+  }
+})
