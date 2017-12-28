@@ -49,3 +49,14 @@ func TestReturnStatements(t *testing.T) {
 
 	cupaloy.SnapshotT(t, program)
 }
+
+func TestIdentifierExpression(t *testing.T) {
+	input := `foobar;`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+	assert.Len(t, program.Statements, 1)
+
+	cupaloy.SnapshotT(t, program)
+}

@@ -7,6 +7,27 @@ import (
 	"fmt"
 )
 
+type Precedence int
+
+// Precedences for Monkey. The order here is important, more so than specific values.
+const (
+	// https://github.com/golang/go/wiki/Iota
+	_               Precedence = iota
+	LOWEST
+	EQUALS           // ==
+	LESS_OR_GREATER  // > or <
+	SUM              // +
+	PRODUCT          // *
+	PREFIX           // -X or !X
+	CALL             // myFunction(x)
+)
+
+type (
+	prefixParseFn func() ast.Expression
+	// The argument is the left hand side of the expression, i.e. `1 + 2` this will be `1`
+	infixParseFn func(ast.Expression) ast.Expression
+)
+
 type Parser struct {
 	l *lexer.Lexer
 
@@ -14,6 +35,9 @@ type Parser struct {
 	peekToken token.Token
 
 	errors []string
+
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -23,12 +47,28 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 	p.nextToken()
 
+	// Register the tokens for our expression parsing
+	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	p.registerPrefix(token.IDENTIFIER, p.parseIdentifier)
+
 	return p
 }
 
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+}
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, prefixParseFn prefixParseFn) {
+	p.prefixParseFns[tokenType] = prefixParseFn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, infixParseFn infixParseFn) {
+	p.infixParseFns[tokenType] = infixParseFn
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 func (p *Parser) Errors() []string {
@@ -65,8 +105,33 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	default:
+		return p.parseExpressionStatement()
 	}
 	return nil
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	// Allow optional semicolons for ease to the developer when using a REPL
+	if p.isPeekToken(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type]
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+	return leftExp
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {

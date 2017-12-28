@@ -1,0 +1,17 @@
+(*ast.Program)({
+  Statements: ([]ast.Statement) (len=1) {
+    (*ast.ExpressionStatement)({
+      Token: (token.Token) {
+        Type: (token.TokenType) (len=10) "IDENTIFIER",
+        Literal: (string) (len=6) "foobar"
+      },
+      Expression: (*ast.Identifier)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=10) "IDENTIFIER",
+          Literal: (string) (len=6) "foobar"
+        },
+        Value: (string) (len=6) "foobar"
+      })
+    })
+  }
+})

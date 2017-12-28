@@ -23,6 +23,14 @@ Feel free to type in commands, for example: 1 + 3
 >>
 ```
 
+### Parsing
+
+The parsing algorithm used is based on the "Top Down operator Precedence" work of Vaughan Pratt. Although this parser
+implementation doesn't follow the specific terminology of NUD/LED/STD, etc.
+
+Related work:
+- https://crockford.com/javascript/tdop/tdop.html
+
 ### Testing
 
 Running all tests
