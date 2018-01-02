@@ -26,9 +26,14 @@ Feel free to type in commands, for example: 1 + 3
 ### Parsing
 
 The parsing algorithm used is based on the "Top Down operator Precedence" work of Vaughan Pratt. Although this parser
-implementation doesn't follow the specific terminology of NUD/LED/STD, etc.
+implementation doesn't follow the specific terminology of nud/led/std, etc.
+
+In particular, the prefix parsing functions are "nuds" for null denotations, and infix parse functions are "leds" for
+left denotations.
 
 Related work:
+- http://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/
+- https://eli.thegreenplace.net/2010/01/02/top-down-operator-precedence-parsing
 - https://crockford.com/javascript/tdop/tdop.html
 
 ### Testing

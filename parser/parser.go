@@ -10,18 +10,31 @@ import (
 
 type Precedence int
 
-// Precedences for Monkey. The order here is important, more so than specific values.
+// Available precedences for Monkey. The order here is important, more so than specific values.
 const (
 	// https://github.com/golang/go/wiki/Iota
 	_               Precedence = iota
 	LOWEST
-	EQUALS           // ==
+	EQUALS           // == or !=
 	LESS_OR_GREATER  // > or <
-	SUM              // +
-	PRODUCT          // *
+	SUM              // + or -
+	PRODUCT          // * or /
 	PREFIX           // -X or !X
 	CALL             // myFunction(x)
 )
+
+// This particular parser does not make use of a separate left/right precedence, instead they are
+// the same value
+var precedences = map[token.TokenType]Precedence{
+	token.EQ_EQ:        EQUALS,
+	token.NOT_EQ:       EQUALS,
+	token.LESS_THAN:    LESS_OR_GREATER,
+	token.GREATER_THAN: LESS_OR_GREATER,
+	token.PLUS:         SUM,
+	token.MINUS:        SUM,
+	token.SLASH:        PRODUCT,
+	token.ASTERISK:     PRODUCT,
+}
 
 type (
 	prefixParseFn func() ast.Expression
@@ -55,6 +68,16 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
+	p.infixParseFns = make(map[token.TokenType]infixParseFn)
+	p.registerInfix(token.PLUS, p.parseInfixExpression)
+	p.registerInfix(token.MINUS, p.parseInfixExpression)
+	p.registerInfix(token.SLASH, p.parseInfixExpression)
+	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(token.EQ_EQ, p.parseInfixExpression)
+	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
+	p.registerInfix(token.LESS_THAN, p.parseInfixExpression)
+	p.registerInfix(token.GREATER_THAN, p.parseInfixExpression)
+
 	return p
 }
 
@@ -84,6 +107,20 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 	p.nextToken()
 
 	expression.Right = p.parseExpression(PREFIX)
+	return expression
+}
+
+func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := &ast.InfixExpression{
+		Token:    p.curToken,
+		Left:     left,
+		Operator: p.curToken.Literal,
+	}
+
+	precedence := p.curPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
+
 	return expression
 }
 
@@ -167,6 +204,18 @@ func (p *Parser) parseExpression(precedence Precedence) ast.Expression {
 	}
 
 	leftExp := prefix()
+
+	for !p.isPeekToken(token.SEMICOLON) && precedence < p.peekPrecedence() {
+		infix := p.infixParseFns[p.peekToken.Type]
+		if infix == nil {
+			return leftExp
+		}
+
+		p.nextToken()
+		// Note the explicit re-assignment to 'leftExp'
+		leftExp = infix(leftExp)
+	}
+
 	return leftExp
 }
 
@@ -218,4 +267,18 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.appendPeekError(t)
 		return false
 	}
+}
+
+func (p *Parser) peekPrecedence() Precedence {
+	if p, ok := precedences[p.peekToken.Type]; ok {
+		return p
+	}
+	return LOWEST
+}
+
+func (p *Parser) curPrecedence() Precedence {
+	if p, ok := precedences[p.curToken.Type]; ok {
+		return p
+	}
+	return LOWEST
 }

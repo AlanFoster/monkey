@@ -157,3 +157,28 @@ func (pe *PrefixExpression) PrettyPrint() string {
 
 	return out.String()
 }
+
+// AST For `left [operand] right`, i.e. `5 + 5`
+type InfixExpression struct {
+	Token    token.Token
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+func (ie *InfixExpression) expressionStatement() {}
+func (ie *InfixExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+
+func (ie *InfixExpression) PrettyPrint() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.PrettyPrint())
+	out.WriteString(" " + ie.Operator + " ")
+	out.WriteString(ie.Right.PrettyPrint())
+	out.WriteString(")")
+
+	return out.String()
+}
