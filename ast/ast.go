@@ -18,7 +18,7 @@ type Statement interface {
 
 type Expression interface {
 	Node
-	expressionStatement()
+	expressionNode()
 }
 
 type Program struct {
@@ -75,7 +75,7 @@ type Identifier struct {
 	Value string
 }
 
-func (i *Identifier) expressionStatement() {}
+func (i *Identifier) expressionNode() {}
 func (i *Identifier) TokenLiteral() string {
 	return i.Token.Literal
 }
@@ -127,7 +127,7 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionStatement() {}
+func (il *IntegerLiteral) expressionNode() {}
 func (il *IntegerLiteral) TokenLiteral() string {
 	return il.Token.Literal
 }
@@ -142,7 +142,7 @@ type PrefixExpression struct {
 	Right    Expression
 }
 
-func (pe *PrefixExpression) expressionStatement() {}
+func (pe *PrefixExpression) expressionNode() {}
 func (pe *PrefixExpression) TokenLiteral() string {
 	return pe.Token.Literal
 }
@@ -166,7 +166,7 @@ type InfixExpression struct {
 	Right    Expression
 }
 
-func (ie *InfixExpression) expressionStatement() {}
+func (ie *InfixExpression) expressionNode() {}
 func (ie *InfixExpression) TokenLiteral() string {
 	return ie.Token.Literal
 }
