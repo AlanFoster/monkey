@@ -164,3 +164,40 @@ func TestOperatorPrecedence(t *testing.T) {
 		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
 	}
 }
+
+func TestTrueBoolean(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedPrettyText string
+	}{
+		{
+			"true",
+			"true",
+		},
+		{
+			"false",
+			"false",
+		},
+		{
+			"3 > 5 == false",
+			"((3 > 5) == false)",
+		},
+		{
+			"3 < 5 == true",
+			"((3 < 5) == true)",
+		},
+		{
+			"false == true",
+			"(false == true)",
+		},
+	}
+
+	for _, test := range tests {
+		l := lexer.New(test.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		assert.Empty(t, p.Errors())
+		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
+	}
+}
