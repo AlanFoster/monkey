@@ -71,6 +71,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FALSE, p.parseBooleanExpression)
 	p.registerPrefix(token.LEFT_PAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfStatement)
+	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -203,12 +204,58 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	return integerLiteral
 }
 
+func (p *Parser) parseFunctionLiteral() ast.Expression {
+	functionLiteral := &ast.FunctionLiteral{Token: p.curToken}
+
+	if !p.expectPeek(token.LEFT_PAREN) {
+		return nil
+	}
+
+	functionLiteral.Parameters = p.parseFunctionParameters()
+
+	if !p.expectPeek(token.LEFT_BRACE) {
+		return nil
+	}
+
+	functionLiteral.Body = p.parseBlockStatement()
+
+	return functionLiteral
+}
+
+func (p *Parser) parseFunctionParameters() []ast.Identifier {
+	identifiers := []ast.Identifier{}
+
+	p.expectCur(token.LEFT_PAREN)
+
+	for !p.isCurToken(token.RIGHT_PAREN) {
+		identifier := ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		identifiers = append(identifiers, identifier)
+		p.expectCur(token.IDENTIFIER)
+
+		if !p.isCurToken(token.COMMA) {
+			break
+		}
+
+		p.expectCur(token.COMMA)
+	}
+
+	// The convention is the calling of next function consumes the next token
+	// p.expectCur(token.RIGHT_PAREN)
+
+	return identifiers
+}
+
 func (p *Parser) parseBooleanExpression() ast.Expression {
 	return &ast.Boolean{Token: p.curToken, Value: p.isCurToken(token.TRUE)}
 }
 
 func (p *Parser) Errors() []string {
 	return p.errors
+}
+
+func (p *Parser) appendCurError(t token.TokenType) {
+	msg := fmt.Sprintf("expected current token to be %s, but got %s instead", t, p.peekToken)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) appendPeekError(t token.TokenType) {
@@ -334,6 +381,16 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		return true
 	} else {
 		p.appendPeekError(t)
+		return false
+	}
+}
+
+func (p *Parser) expectCur(t token.TokenType) bool {
+	if p.isCurToken(t) {
+		p.nextToken()
+		return true
+	} else {
+		p.appendCurError(t)
 		return false
 	}
 }

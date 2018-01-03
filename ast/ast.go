@@ -3,6 +3,7 @@ package ast
 import (
 	"github.com/alanfoster/monkey/token"
 	"bytes"
+	"strings"
 )
 
 type Node interface {
@@ -226,7 +227,7 @@ func (b *IfExpression) PrettyPrint() string {
 }
 
 type BlockStatement struct {
-	Token     token.Token
+	Token      token.Token
 	Statements []Statement
 }
 
@@ -238,6 +239,35 @@ func (bs *BlockStatement) PrettyPrint() string {
 	var out bytes.Buffer
 	for _, s := range bs.Statements {
 		out.WriteString(s.PrettyPrint())
+		out.WriteString(";")
 	}
+	return out.String()
+}
+
+type FunctionLiteral struct {
+	Token      token.Token
+	Parameters []Identifier
+	Body       *BlockStatement
+}
+
+func (fl *FunctionLiteral) expressionNode() {}
+func (fl *FunctionLiteral) TokenLiteral() string {
+	return fl.Token.Literal
+}
+func (fl *FunctionLiteral) PrettyPrint() string {
+	var out bytes.Buffer
+
+	parameters := []string{}
+	for _, identifier := range fl.Parameters {
+		parameters = append(parameters, identifier.PrettyPrint())
+	}
+
+	out.WriteString(fl.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(parameters, ", "))
+	out.WriteString(") { ")
+	out.WriteString(fl.Body.PrettyPrint())
+	out.WriteString(" }")
+
 	return out.String()
 }

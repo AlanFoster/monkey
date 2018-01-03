@@ -237,7 +237,6 @@ func TestIfStatement(t *testing.T) {
 	cupaloy.SnapshotT(t, program)
 }
 
-
 func TestIfElseStatement(t *testing.T) {
 	input := `
 		if (x < y) {
@@ -253,4 +252,50 @@ func TestIfElseStatement(t *testing.T) {
 	assert.Empty(t, p.Errors())
 
 	cupaloy.SnapshotT(t, program)
+}
+
+func TestFunctionLiteral(t *testing.T) {
+	input := `
+		fn(x, y) { x + y; };
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}
+
+func TestFunctionLiteralArity(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedPrettyText string
+	}{
+		{
+			"fn() { 1337; }",
+			"fn() { 1337; }",
+		},
+		{
+			"fn(x) { x; }",
+			"fn(x) { x; }",
+		},
+		{
+			"fn(x, y) { x + y; }",
+			"fn(x, y) { (x + y); }",
+		},
+		{
+			"fn(x, y, z) { x + y + z; }",
+			"fn(x, y, z) { ((x + y) + z); }",
+		},
+	}
+
+	for _, test := range tests {
+		l := lexer.New(test.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		assert.Empty(t, p.Errors())
+		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
+	}
 }
