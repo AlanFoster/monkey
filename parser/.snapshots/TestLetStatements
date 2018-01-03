@@ -12,7 +12,13 @@
         },
         Value: (string) (len=1) "x"
       }),
-      Value: (ast.Expression) <nil>
+      Value: (*ast.IntegerLiteral)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=3) "INT",
+          Literal: (string) (len=1) "5"
+        },
+        Value: (int64) 5
+      })
     }),
     (*ast.LetStatement)({
       Token: (token.Token) {
@@ -26,7 +32,13 @@
         },
         Value: (string) (len=1) "y"
       }),
-      Value: (ast.Expression) <nil>
+      Value: (*ast.IntegerLiteral)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=3) "INT",
+          Literal: (string) (len=2) "10"
+        },
+        Value: (int64) 10
+      })
     }),
     (*ast.LetStatement)({
       Token: (token.Token) {
@@ -40,7 +52,13 @@
         },
         Value: (string) (len=6) "foobar"
       }),
-      Value: (ast.Expression) <nil>
+      Value: (*ast.IntegerLiteral)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=3) "INT",
+          Literal: (string) (len=6) "838383"
+        },
+        Value: (int64) 838383
+      })
     })
   }
 })
