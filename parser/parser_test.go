@@ -299,3 +299,29 @@ func TestFunctionLiteralArity(t *testing.T) {
 		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
 	}
 }
+
+func TestIdentifierCall(t *testing.T) {
+	input := `
+		max(5, 1 + 2);
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}
+
+func TestInlinedFunctionCall(t *testing.T) {
+	input := `
+		fn(x, y) { x + y; }(5, 10);
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}

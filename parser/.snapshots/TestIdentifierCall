@@ -1,0 +1,53 @@
+(*ast.Program)({
+  Statements: ([]ast.Statement) (len=1) {
+    (*ast.ExpressionStatement)({
+      Token: (token.Token) {
+        Type: (token.TokenType) (len=10) "IDENTIFIER",
+        Literal: (string) (len=3) "max"
+      },
+      Expression: (*ast.CallExpression)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=1) "(",
+          Literal: (string) (len=1) "("
+        },
+        Function: (*ast.Identifier)({
+          Token: (token.Token) {
+            Type: (token.TokenType) (len=10) "IDENTIFIER",
+            Literal: (string) (len=3) "max"
+          },
+          Value: (string) (len=3) "max"
+        }),
+        Arguments: ([]ast.Expression) (len=2) {
+          (*ast.IntegerLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=3) "INT",
+              Literal: (string) (len=1) "5"
+            },
+            Value: (int64) 5
+          }),
+          (*ast.InfixExpression)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=1) "+",
+              Literal: (string) (len=1) "+"
+            },
+            Left: (*ast.IntegerLiteral)({
+              Token: (token.Token) {
+                Type: (token.TokenType) (len=3) "INT",
+                Literal: (string) (len=1) "1"
+              },
+              Value: (int64) 1
+            }),
+            Operator: (string) (len=1) "+",
+            Right: (*ast.IntegerLiteral)({
+              Token: (token.Token) {
+                Type: (token.TokenType) (len=3) "INT",
+                Literal: (string) (len=1) "2"
+              },
+              Value: (int64) 2
+            })
+          })
+        }
+      })
+    })
+  }
+})

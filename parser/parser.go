@@ -34,6 +34,7 @@ var precedences = map[token.TokenType]Precedence{
 	token.MINUS:        SUM,
 	token.SLASH:        PRODUCT,
 	token.ASTERISK:     PRODUCT,
+	token.LEFT_PAREN:   CALL,
 }
 
 type (
@@ -82,6 +83,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LESS_THAN, p.parseInfixExpression)
 	p.registerInfix(token.GREATER_THAN, p.parseInfixExpression)
+	p.registerInfix(token.LEFT_PAREN, p.parseCallExpression)
 
 	return p
 }
@@ -236,13 +238,49 @@ func (p *Parser) parseFunctionParameters() []ast.Identifier {
 			break
 		}
 
-		p.expectCur(token.COMMA)
+		if !p.expectCur(token.COMMA) {
+			return nil
+		}
 	}
 
 	// The convention is the calling of next function consumes the next token
 	// p.expectCur(token.RIGHT_PAREN)
 
 	return identifiers
+}
+
+func (p *Parser) parseCallExpression(left ast.Expression) ast.Expression {
+	expression := &ast.CallExpression{
+		Token:    p.curToken,
+		Function: left,
+	}
+	expression.Arguments = p.parseFunctionArguments()
+
+	return expression
+}
+
+func (p *Parser) parseFunctionArguments() []ast.Expression {
+	args := []ast.Expression{}
+	p.expectCur(token.LEFT_PAREN)
+
+	for !p.isCurToken(token.RIGHT_PAREN) {
+		arg := p.parseExpression(LOWEST)
+		args = append(args, arg)
+		p.nextToken()
+
+		if !p.isCurToken(token.COMMA) {
+			break;
+		}
+
+		if !p.expectCur(token.COMMA) {
+			return nil
+		}
+	}
+
+	// Unlike the previous parseFunction implementation, we consume this right paren
+	p.expectCur(token.RIGHT_PAREN)
+
+	return args
 }
 
 func (p *Parser) parseBooleanExpression() ast.Expression {

@@ -271,3 +271,29 @@ func (fl *FunctionLiteral) PrettyPrint() string {
 
 	return out.String()
 }
+
+type CallExpression struct {
+	Token token.Token
+	Function Expression // Identifier or function literal
+	Arguments []Expression
+}
+
+func (ce *CallExpression) expressionNode() {}
+func (ce *CallExpression) TokenLiteral() string {
+	return ce.Token.Literal
+}
+func (ce *CallExpression) PrettyPrint() string {
+	var out bytes.Buffer
+
+	arguments := []string{}
+	for _, argument := range ce.Arguments {
+		arguments = append(arguments, argument.PrettyPrint())
+	}
+
+	out.WriteString(ce.Function.PrettyPrint())
+	out.WriteString("(")
+	out.WriteString(strings.Join(arguments, ", "))
+	out.WriteString(")")
+
+	return out.String()
+}

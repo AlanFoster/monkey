@@ -1,0 +1,89 @@
+(*ast.Program)({
+  Statements: ([]ast.Statement) (len=1) {
+    (*ast.ExpressionStatement)({
+      Token: (token.Token) {
+        Type: (token.TokenType) (len=8) "FUNCTION",
+        Literal: (string) (len=2) "fn"
+      },
+      Expression: (*ast.CallExpression)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=1) "(",
+          Literal: (string) (len=1) "("
+        },
+        Function: (*ast.FunctionLiteral)({
+          Token: (token.Token) {
+            Type: (token.TokenType) (len=8) "FUNCTION",
+            Literal: (string) (len=2) "fn"
+          },
+          Parameters: ([]ast.Identifier) (len=2) {
+            (ast.Identifier) {
+              Token: (token.Token) {
+                Type: (token.TokenType) (len=10) "IDENTIFIER",
+                Literal: (string) (len=1) "x"
+              },
+              Value: (string) (len=1) "x"
+            },
+            (ast.Identifier) {
+              Token: (token.Token) {
+                Type: (token.TokenType) (len=10) "IDENTIFIER",
+                Literal: (string) (len=1) "y"
+              },
+              Value: (string) (len=1) "y"
+            }
+          },
+          Body: (*ast.BlockStatement)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=1) "{",
+              Literal: (string) (len=1) "{"
+            },
+            Statements: ([]ast.Statement) (len=1) {
+              (*ast.ExpressionStatement)({
+                Token: (token.Token) {
+                  Type: (token.TokenType) (len=10) "IDENTIFIER",
+                  Literal: (string) (len=1) "x"
+                },
+                Expression: (*ast.InfixExpression)({
+                  Token: (token.Token) {
+                    Type: (token.TokenType) (len=1) "+",
+                    Literal: (string) (len=1) "+"
+                  },
+                  Left: (*ast.Identifier)({
+                    Token: (token.Token) {
+                      Type: (token.TokenType) (len=10) "IDENTIFIER",
+                      Literal: (string) (len=1) "x"
+                    },
+                    Value: (string) (len=1) "x"
+                  }),
+                  Operator: (string) (len=1) "+",
+                  Right: (*ast.Identifier)({
+                    Token: (token.Token) {
+                      Type: (token.TokenType) (len=10) "IDENTIFIER",
+                      Literal: (string) (len=1) "y"
+                    },
+                    Value: (string) (len=1) "y"
+                  })
+                })
+              })
+            }
+          })
+        }),
+        Arguments: ([]ast.Expression) (len=2) {
+          (*ast.IntegerLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=3) "INT",
+              Literal: (string) (len=1) "5"
+            },
+            Value: (int64) 5
+          }),
+          (*ast.IntegerLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=3) "INT",
+              Literal: (string) (len=2) "10"
+            },
+            Value: (int64) 10
+          })
+        }
+      })
+    })
+  }
+})
