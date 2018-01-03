@@ -70,6 +70,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.TRUE, p.parseBooleanExpression)
 	p.registerPrefix(token.FALSE, p.parseBooleanExpression)
 	p.registerPrefix(token.LEFT_PAREN, p.parseGroupedExpression)
+	p.registerPrefix(token.IF, p.parseIfStatement)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -136,6 +137,56 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	}
 
 	return expression
+}
+
+func (p *Parser) parseIfStatement() ast.Expression {
+	expression := &ast.IfExpression{Token: p.curToken}
+
+	if !p.expectPeek(token.LEFT_PAREN) {
+		return nil
+	}
+
+	p.nextToken()
+	expression.Predicate = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RIGHT_PAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LEFT_BRACE) {
+		return nil
+	}
+	expression.TrueBlock = p.parseBlockStatement()
+
+	if p.isPeekToken(token.ELSE) {
+		p.expectPeek(token.ELSE)
+
+		if !p.expectPeek(token.LEFT_BRACE) {
+			return nil
+		}
+
+		expression.FalseBlock = p.parseBlockStatement()
+	}
+
+	return expression
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.curToken}
+	block.Statements = []ast.Statement{}
+
+	// This function assumes the curToken is currently on the left brace
+	p.nextToken()
+
+	for !p.isCurToken(token.RIGHT_BRACE) && !p.isCurToken(token.EOF) {
+		statement := p.parseStatement()
+		if statement != nil {
+			block.Statements = append(block.Statements, statement)
+		}
+		p.nextToken()
+	}
+
+	return block
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {

@@ -195,3 +195,49 @@ func (b *Boolean) TokenLiteral() string {
 func (b *Boolean) PrettyPrint() string {
 	return b.Token.Literal
 }
+
+type IfExpression struct {
+	Token      token.Token
+	Predicate  Expression
+	TrueBlock  *BlockStatement
+	FalseBlock *BlockStatement
+}
+
+func (b *IfExpression) expressionNode() {}
+func (b *IfExpression) TokenLiteral() string {
+	return b.Token.Literal
+}
+func (b *IfExpression) PrettyPrint() string {
+	var out bytes.Buffer
+
+	out.WriteString("if (")
+	out.WriteString(b.Predicate.PrettyPrint())
+	out.WriteString(") {")
+	out.WriteString(b.TrueBlock.PrettyPrint())
+	out.WriteString("}")
+
+	if b.FalseBlock != nil {
+		out.WriteString(" else {")
+		out.WriteString(b.FalseBlock.PrettyPrint())
+		out.WriteString("}")
+	}
+
+	return out.String()
+}
+
+type BlockStatement struct {
+	Token     token.Token
+	Statements []Statement
+}
+
+func (bs *BlockStatement) statementNode() {}
+func (bs *BlockStatement) TokenLiteral() string {
+	return bs.Token.Literal
+}
+func (bs *BlockStatement) PrettyPrint() string {
+	var out bytes.Buffer
+	for _, s := range bs.Statements {
+		out.WriteString(s.PrettyPrint())
+	}
+	return out.String()
+}

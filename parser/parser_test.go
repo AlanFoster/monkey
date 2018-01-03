@@ -221,3 +221,36 @@ func TestTrueBoolean(t *testing.T) {
 		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
 	}
 }
+
+func TestIfStatement(t *testing.T) {
+	input := `
+		if (x < y) {
+			x
+		}
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}
+
+
+func TestIfElseStatement(t *testing.T) {
+	input := `
+		if (x < y) {
+			x
+		} else {
+			y
+		}
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}

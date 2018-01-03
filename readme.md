@@ -49,6 +49,12 @@ Running a particular folder's tests:
 go test ./lexer
 ```
 
+To run a particular test:
+
+```shell
+go test ./parser -run TestIfStatement
+```
+
 The testing approach chosen is similar to [Golden Master Testing](https://en.wikipedia.org/wiki/Characterization_test).
 A test's output is recorded, and used as a reference to compare future test runs against. If the output has changed, the
 test will fail. This is similar to Jest's [snapshot testing](https://facebook.github.io/jest/docs/en/snapshot-testing.html).
