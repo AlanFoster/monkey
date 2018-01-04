@@ -11,16 +11,30 @@ There is a REPL (Read Eval Print Loop) available via:
 go run ./main.go
 
 This is the monkey programming language!
-Feel free to type in commands, for example: 1 + 3
->> (1 + 3) > 2
-{Type:( Literal:(}
+Feel free to type in commands, for example: 1 + 2 + 3
+To set the mode:
+mode=lexing
+mode=parsing
+>> mode=lexing
+Entering lexing mode
+Successfully configured
+
+>> 1 + 2 + 3
 {Type:INT Literal:1}
 {Type:+ Literal:+}
+{Type:INT Literal:2}
+{Type:+ Literal:+}
 {Type:INT Literal:3}
-{Type:) Literal:)}
-{Type:> Literal:>}
-{Type:INT Literal:2
->>
+
+>> mode=parsing
+Entering parsing mode
+Successfully configured
+
+>> 1 + 2 + 3
+((1 + 2) + 3)
+
+>> exit
+Exiting...
 ```
 
 ### Parsing
@@ -40,6 +54,7 @@ Related work:
 ### Testing
 
 Running all tests
+
 ```shell
 go test ./...
 ```
@@ -65,6 +80,14 @@ If you wish to re-record snapshot tests:
 
 ```shell
 UPDATE_SNAPSHOTS=true go test ./...
+```
+
+There is also REPL tests available:
+
+```shell
+> ./test-repl.sh
+...
+Tests passed successfully
 ```
 
 ### Dependencies
