@@ -8,15 +8,14 @@ A Go implementation of the Monkey language as described in https://interpreterbo
 There is a REPL (Read Eval Print Loop) available via:
 
 ```shell
-go run ./main.go
-
 This is the monkey programming language!
 Feel free to type in commands, for example: 1 + 2 + 3
 To set the mode:
-mode=lexing
-mode=parsing
->> mode=lexing
-Entering lexing mode
+mode=lex
+mode=parse
+mode=eval
+>> mode=lex
+Entering lex mode
 Successfully configured
 
 >> 1 + 2 + 3
@@ -26,12 +25,19 @@ Successfully configured
 {Type:+ Literal:+}
 {Type:INT Literal:3}
 
->> mode=parsing
-Entering parsing mode
+>> mode=parse
+Entering parse mode
 Successfully configured
 
 >> 1 + 2 + 3
 ((1 + 2) + 3)
+
+>> mode=eval
+Entering eval mode
+Successfully configured
+
+>> !true
+false
 
 >> exit
 Exiting...
