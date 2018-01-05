@@ -36,8 +36,8 @@ Successfully configured
 Entering eval mode
 Successfully configured
 
->> !true
-false
+>> 1 + 2 + 3
+6
 
 >> exit
 Exiting...
