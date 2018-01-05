@@ -49,6 +49,14 @@ func TestEvalIntegerExpressions(t *testing.T) {
 			"1337",
 			1337,
 		},
+		{
+			"-15;",
+			-15,
+		},
+		{
+			"-1337",
+			-1337,
+		},
 	}
 
 	for _, test := range tests {

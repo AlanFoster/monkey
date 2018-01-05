@@ -8,7 +8,7 @@ import (
 var (
 	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
-	NULL = &object.Null{}
+	NULL  = &object.Null{}
 )
 
 func evalStatements(statements []ast.Statement) object.Object {
@@ -28,8 +28,8 @@ func asBoolean(value bool) *object.Boolean {
 	return FALSE
 }
 
-func evalBangOperatorExpression(object object.Object) object.Object {
-	switch object {
+func evalBangPrefixOperatorExpression(right object.Object) object.Object {
+	switch right {
 	case TRUE:
 		return FALSE
 	case FALSE:
@@ -41,10 +41,21 @@ func evalBangOperatorExpression(object object.Object) object.Object {
 	}
 }
 
-func evalPrefixExpression(operator string, object object.Object) object.Object {
+func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
+	if right.Type() != object.INTEGER {
+		return NULL
+	}
+
+	value := right.(*object.Integer).Value
+	return &object.Integer{Value: -value}
+}
+
+func evalPrefixExpression(operator string, right object.Object) object.Object {
 	switch operator {
 	case "!":
-		return evalBangOperatorExpression(object)
+		return evalBangPrefixOperatorExpression(right)
+	case "-":
+		return evalMinusPrefixOperatorExpression(right)
 	default:
 		return NULL
 	}
@@ -61,8 +72,8 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Boolean:
 		return asBoolean(node.Value)
 	case *ast.PrefixExpression:
-		value := Eval(node.Right)
-		return evalPrefixExpression(node.Operator, value)
+		right := Eval(node.Right)
+		return evalPrefixExpression(node.Operator, right)
 	}
 
 	return nil
