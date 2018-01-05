@@ -127,7 +127,7 @@ func TestBooleanExpressions(t *testing.T) {
 	}
 }
 
-func TestInfixBooleanOperatorExpressions(t *testing.T) {
+func TestInfixIntegerBooleanOperatorExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected bool
@@ -172,8 +172,6 @@ func TestInfixBooleanOperatorExpressions(t *testing.T) {
 	}
 }
 
-
-
 func TestPrefixBangBooleanExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
@@ -211,3 +209,31 @@ func TestPrefixBangBooleanExpressions(t *testing.T) {
 	}
 }
 
+func TestInfixBooleanBooleanOperatorExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{
+			"true == true;",
+			true,
+		},
+		{
+			"true == false;",
+			false,
+		},
+		{
+			"true != true;",
+			false,
+		},
+		{
+			"true != false;",
+			true,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertBooleanObject(t, evaluated, test.expected)
+	}
+}

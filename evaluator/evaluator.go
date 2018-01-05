@@ -93,7 +93,10 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 		first := *left.(*object.Integer)
 		second := *right.(*object.Integer)
 		return evalIntegerInfixExpression(operator, first, second)
-
+	case operator == "==":
+		return asBoolean(left == right)
+	case operator == "!=":
+		return asBoolean(left != right)
 	default:
 		return NULL
 	}
