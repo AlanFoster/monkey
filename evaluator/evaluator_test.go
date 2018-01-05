@@ -24,8 +24,8 @@ func assertBooleanObject(t *testing.T, o object.Object, expected bool) {
 	}
 }
 
-func assertNullObject(t *testing.T, o object.Object, expected bool) {
-	assert.IsType(t, new(object.Null), o)
+func assertNullObject(t *testing.T, o object.Object) {
+	assert.EqualValues(t, NULL, o)
 }
 
 func eval(t *testing.T, input string) object.Object {
@@ -235,5 +235,82 @@ func TestInfixBooleanBooleanOperatorExpressions(t *testing.T) {
 	for _, test := range tests {
 		evaluated := eval(t, test.input)
 		assertBooleanObject(t, evaluated, test.expected)
+	}
+}
+
+func TestIfStatementExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`
+				if (true) {
+					10;
+				}
+			`,
+			10,
+		},
+		{
+			`
+				if (false) {
+					10;
+				}
+			`,
+			nil,
+		},
+		{
+			`
+				if (true) {
+					10;
+				} else {
+					20;
+				}
+			`,
+			10,
+		},
+		{
+			`
+				if (false) {
+					10;
+				} else {
+					20;
+				}
+			`,
+			20,
+		},
+		{
+			`
+				if (1) {
+					10;
+					30;
+				} else {
+					20;
+				}
+			`,
+			30,
+		},
+		{
+			`
+				if (0) {
+					10;
+					30;
+				} else {
+					20;
+				}
+			`,
+			30,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		integer, ok := test.expected.(int)
+
+		if ok {
+			assertIntegerObject(t, evaluated, int64(integer))
+		} else {
+			assertNullObject(t, evaluated)
+		}
 	}
 }

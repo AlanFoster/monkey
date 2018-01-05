@@ -3,6 +3,7 @@ package evaluator
 import (
 	"github.com/alanfoster/monkey/ast"
 	"github.com/alanfoster/monkey/object"
+	"fmt"
 )
 
 var (
@@ -11,8 +12,18 @@ var (
 	NULL  = &object.Null{}
 )
 
-func evalStatements(statements []ast.Statement) object.Object {
+func evalProgram(statements []ast.Statement) object.Object {
 	var result object.Object
+
+	for _, statement := range statements {
+		result = Eval(statement)
+	}
+
+	return result
+}
+
+func evalBlockStatement(statements []ast.Statement) object.Object {
+	var result object.Object = NULL
 
 	for _, statement := range statements {
 		result = Eval(statement)
@@ -102,10 +113,35 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 	}
 }
 
+func isTruthy(o object.Object) bool {
+	switch o {
+	case FALSE:
+		return false
+	case NULL:
+		return false
+	case TRUE:
+		return true
+	default:
+		return true
+	}
+}
+
+func evalIfExpression(node *ast.IfExpression) object.Object {
+	result := Eval(node.Predicate)
+
+	if isTruthy(result) {
+		return Eval(node.TrueBlock)
+	} else if node.FalseBlock != nil {
+		return Eval(node.FalseBlock)
+	} else {
+		return NULL
+	}
+}
+
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalStatements(node.Statements)
+		return evalProgram(node.Statements)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
 	case *ast.IntegerLiteral:
@@ -119,7 +155,11 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
+	case *ast.IfExpression:
+		return evalIfExpression(node)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node.Statements)
 	}
 
-	return nil
+	panic(fmt.Sprintf("Unexpected value %#v", node))
 }
