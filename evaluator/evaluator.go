@@ -61,31 +61,39 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	}
 }
 
-func evalIntegerInfixExpression(operator string, left object.Object, right object.Object) object.Object {
-	if left.Type() != object.INTEGER && right.Type() == object.INTEGER {
-		return NULL
-	}
-
-	first := left.(*object.Integer).Value
-	second := right.(*object.Integer).Value
+func evalIntegerInfixExpression(operator string, left object.Integer, right object.Integer) object.Object {
+	leftVal := left.Value
+	rightVal := right.Value
 
 	switch operator {
 	case "+":
-		return &object.Integer{Value: first + second}
+		return &object.Integer{Value: leftVal + rightVal}
 	case "-":
-		return &object.Integer{Value: first - second}
+		return &object.Integer{Value: leftVal - rightVal}
 	case "*":
-		return &object.Integer{Value: first * second}
+		return &object.Integer{Value: leftVal * rightVal}
 	case "/":
-		return &object.Integer{Value: first / second}
+		return &object.Integer{Value: leftVal / rightVal}
 	case ">":
-		return &object.Boolean{Value: first > second}
+		return asBoolean(leftVal > rightVal)
 	case "<":
-		return &object.Boolean{Value: first < second}
+		return asBoolean(leftVal < rightVal)
 	case "==":
-		return &object.Boolean{Value: first == second}
+		return asBoolean(leftVal == rightVal)
 	case "!=":
-		return &object.Boolean{Value: first != second}
+		return asBoolean(leftVal != rightVal)
+	default:
+		return NULL
+	}
+}
+
+func evalInfixExpression(operator string, left object.Object, right object.Object) object.Object {
+	switch {
+	case left.Type() == object.INTEGER && right.Type() == object.INTEGER:
+		first := *left.(*object.Integer)
+		second := *right.(*object.Integer)
+		return evalIntegerInfixExpression(operator, first, second)
+
 	default:
 		return NULL
 	}
@@ -107,7 +115,7 @@ func Eval(node ast.Node) object.Object {
 	case *ast.InfixExpression:
 		left := Eval(node.Left)
 		right := Eval(node.Right)
-		return evalIntegerInfixExpression(node.Operator, left, right)
+		return evalInfixExpression(node.Operator, left, right)
 	}
 
 	return nil
