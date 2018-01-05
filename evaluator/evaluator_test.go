@@ -57,7 +57,7 @@ func TestEvalIntegerExpressions(t *testing.T) {
 	}
 }
 
-func TestBooleanIntegerExpressions(t *testing.T) {
+func TestBooleanExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected bool
@@ -69,6 +69,44 @@ func TestBooleanIntegerExpressions(t *testing.T) {
 		{
 			"false;",
 			false,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertBooleanObject(t, evaluated, test.expected)
+	}
+}
+
+
+func TestPrefixBangBooleanExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{
+			"!true;",
+			false,
+		},
+		{
+			"!false;",
+			true,
+		},
+		{
+			"!!false;",
+			false,
+		},
+		{
+			"!!!false;",
+			true,
+		},
+		{
+			"!5;",
+			false,
+		},
+		{
+			"!!5;",
+			true,
 		},
 	}
 
