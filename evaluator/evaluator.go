@@ -20,11 +20,11 @@ func isError(o object.Object) bool {
 	return o != nil && o.Type() == object.ERROR
 }
 
-func evalProgram(statements []ast.Statement) object.Object {
+func evalProgram(statements []ast.Statement, environment *object.Environment) object.Object {
 	var result object.Object
 
 	for _, statement := range statements {
-		result = Eval(statement)
+		result = Eval(statement, environment)
 
 		switch result := result.(type) {
 		case *object.ReturnValue:
@@ -38,11 +38,11 @@ func evalProgram(statements []ast.Statement) object.Object {
 	return result
 }
 
-func evalBlockStatement(statements []ast.Statement) object.Object {
+func evalBlockStatement(statements []ast.Statement, environment *object.Environment) object.Object {
 	var result object.Object = NULL
 
 	for _, statement := range statements {
-		result = Eval(statement)
+		result = Eval(statement, environment)
 
 		// Return the wrapped return value, as we may be nested in multiple block statements
 		if rt := result.Type(); rt == object.RETURN_VALUE || rt == object.ERROR {
@@ -149,59 +149,77 @@ func isTruthy(o object.Object) bool {
 	}
 }
 
-func evalIfExpression(node *ast.IfExpression) object.Object {
-	result := Eval(node.Predicate)
+func evalIfExpression(node *ast.IfExpression, environment *object.Environment) object.Object {
+	result := Eval(node.Predicate, environment)
 
 	if isError(result) {
 		return result
 	}
 
 	if isTruthy(result) {
-		return Eval(node.TrueBlock)
+		return Eval(node.TrueBlock, environment)
 	} else if node.FalseBlock != nil {
-		return Eval(node.FalseBlock)
+		return Eval(node.FalseBlock, environment)
 	} else {
 		return NULL
 	}
 }
 
-func Eval(node ast.Node) object.Object {
+func evalIdentifier(node *ast.Identifier, environment *object.Environment) object.Object {
+	if value, ok := environment.Get(node.Value); ok {
+		return value
+	}
+
+	return newError("identifier not found: %s", node.Value)
+}
+
+func Eval(node ast.Node, environment *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalProgram(node.Statements)
+		return evalProgram(node.Statements, environment)
 	case *ast.ExpressionStatement:
-		return Eval(node.Expression)
+		return Eval(node.Expression, environment)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
 		return asBoolean(node.Value)
 	case *ast.PrefixExpression:
-		right := Eval(node.Right)
+		right := Eval(node.Right, environment)
 		if isError(right) {
 			return right
 		}
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.InfixExpression:
-		left := Eval(node.Left)
+		left := Eval(node.Left, environment)
 		if isError(left) {
 			return left
 		}
 
-		right := Eval(node.Right)
+		right := Eval(node.Right, environment)
 		if isError(right) {
 			return right
 		}
 		return evalInfixExpression(node.Operator, left, right)
 	case *ast.IfExpression:
-		return evalIfExpression(node)
+		return evalIfExpression(node, environment)
 	case *ast.BlockStatement:
-		return evalBlockStatement(node.Statements)
+		return evalBlockStatement(node.Statements, environment)
 	case *ast.ReturnStatement:
-		value := Eval(node.Value)
+		value := Eval(node.Value, environment)
 		if isError(value) {
 			return value
 		}
 		return &object.ReturnValue{Value: value}
+	case *ast.LetStatement:
+		value := Eval(node.Value, environment)
+		if isError(value) {
+			return value
+		}
+
+		environment.Add(node.Name.Value, value)
+		return value
+	case *ast.Identifier:
+		return evalIdentifier(node, environment)
 	}
 
 	panic(fmt.Sprintf("Unexpected value %#v", node))

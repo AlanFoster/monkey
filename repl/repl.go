@@ -8,6 +8,7 @@ import (
 	"github.com/alanfoster/monkey/token"
 	"github.com/alanfoster/monkey/evaluator"
 	"fmt"
+	"github.com/alanfoster/monkey/object"
 )
 
 const PROMPT = ">> "
@@ -28,8 +29,9 @@ const (
 )
 
 type Repl struct {
-	Mode Mode
-	out  io.Writer
+	Mode        Mode
+	out         io.Writer
+	environment *object.Environment
 }
 
 func (r *Repl) OutputUsage() {
@@ -102,7 +104,7 @@ func (r *Repl) eval(line string) {
 		return
 	}
 
-	eval := evaluator.Eval(program)
+	eval := evaluator.Eval(program, r.environment)
 	fmt.Fprintln(r.out, eval.Inspect())
 }
 
@@ -116,8 +118,9 @@ func (r *Repl) printParsingErrors(errors []string) {
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	repl := Repl{
-		Mode: EVAL,
-		out:  out,
+		Mode:        EVAL,
+		out:         out,
+		environment: object.NewEnvironment(),
 	}
 
 	repl.OutputUsage()

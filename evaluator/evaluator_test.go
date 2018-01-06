@@ -39,9 +39,10 @@ func assertNullObject(t *testing.T, o object.Object) {
 func eval(t *testing.T, input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
+	environment := object.NewEnvironment()
 	program := p.ParseProgram()
 	assert.Empty(t, p.Errors())
-	return Eval(program)
+	return Eval(program, environment)
 }
 
 func TestEvalIntegerExpressions(t *testing.T) {
@@ -393,10 +394,43 @@ func TestErrorHandling(t *testing.T) {
 			"if (10 + true) { 10 }",
 			"type mismatch: INTEGER + BOOLEAN",
 		},
+		{
+			"nonExistentVariable;",
+			"identifier not found: nonExistentVariable",
+		},
 	}
 
 	for _, test := range tests {
 		evaluated := eval(t, test.input)
 		assertErrorObject(t, evaluated, test.expected)
+	}
+}
+
+func TestAssignmentHandling(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{
+			"let a = 5; a",
+			5,
+		},
+		{
+			"let a = 5; let b = 10; a + b;",
+			15,
+		},
+		{
+			"let a = 5; let b = 10; let c = 20; a + b + c + 5;",
+			40,
+		},
+		{
+			"let a = 5; let b = a; a + b",
+			10,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertIntegerObject(t, evaluated, test.expected)
 	}
 }
