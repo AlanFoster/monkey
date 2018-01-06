@@ -96,6 +96,23 @@ There is also REPL tests available:
 Tests passed successfully
 ```
 
+### Take aways
+
+Go supports "enums" via https://github.com/golang/go/wiki/Iota, however if you want a Stringer implementation this can
+be generated for you via a comment:
+
+```go
+//go:generate stringer -type=ObjectType
+```
+
+However you require a manual call to generate these files:
+
+```shell
+> go generate
+```
+
+Further details: https://blog.golang.org/generate
+
 ### Dependencies
 
 Dependency management is handled by [dep](https://github.com/golang/dep)

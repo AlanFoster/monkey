@@ -4,12 +4,14 @@ import "fmt"
 
 type ObjectType int
 
+//go:generate stringer -type=ObjectType
 const (
-	_       ObjectType = iota
+	_            ObjectType = iota
 	INTEGER
 	BOOLEAN
 	NULL
 	RETURN_VALUE
+	ERROR
 )
 
 type Object interface {
@@ -61,4 +63,16 @@ func (rv *ReturnValue) Type() ObjectType {
 
 func (rv *ReturnValue) Inspect() string {
 	return rv.Value.Inspect()
+}
+
+type Error struct {
+	Message string
+}
+
+func (e *Error) Type() ObjectType {
+	return ERROR
+}
+
+func (e *Error) Inspect() string {
+	return "ERROR: " + e.Message
 }

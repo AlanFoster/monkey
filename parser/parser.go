@@ -12,7 +12,6 @@ type Precedence int
 
 // Available precedences for Monkey. The order here is important, more so than specific values.
 const (
-	// https://github.com/golang/go/wiki/Iota
 	_               Precedence = iota
 	LOWEST
 	EQUALS           // == or !=

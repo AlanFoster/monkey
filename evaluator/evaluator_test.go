@@ -24,6 +24,14 @@ func assertBooleanObject(t *testing.T, o object.Object, expected bool) {
 	}
 }
 
+func assertErrorObject(t *testing.T, o object.Object, expected string) {
+	assert.IsType(t, new(object.Error), o)
+	result, ok := o.(*object.Error)
+	if assert.True(t, ok) {
+		assert.Equal(t, expected, result.Message)
+	}
+}
+
 func assertNullObject(t *testing.T, o object.Object) {
 	assert.EqualValues(t, NULL, o)
 }
@@ -345,5 +353,50 @@ func TestReturnStatements(t *testing.T) {
 	for _, test := range tests {
 		evaluated := eval(t, test.input)
 		assertIntegerObject(t, evaluated, test.expected)
+	}
+}
+
+func TestErrorHandling(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"5 + true;",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
+		{
+			"5 + true; 5",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
+		{
+			"-true;",
+			"unknown operator: -BOOLEAN",
+		},
+		{
+			"true + false;",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			"5; true + false; 5;",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			"if (10 > 1) { true + false; }",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			"if (10 > 1) { if (10 > 1) { true + false; } }",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			"if (10 + true) { 10 }",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertErrorObject(t, evaluated, test.expected)
 	}
 }
