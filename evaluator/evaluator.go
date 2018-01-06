@@ -173,6 +173,58 @@ func evalIdentifier(node *ast.Identifier, environment *object.Environment) objec
 	return newError("identifier not found: %s", node.Value)
 }
 
+func evalExpressions(expressions []ast.Expression, environment *object.Environment) []object.Object {
+	var args []object.Object
+	for _, argument := range expressions {
+		argumentValue := Eval(argument, environment)
+		if isError(argumentValue) {
+			return []object.Object{argumentValue}
+		}
+		args = append(args, argumentValue)
+	}
+	return args
+}
+
+func extendFunctionEnvironment(function *object.Function, args []object.Object) *object.Environment {
+	newEnvironment := object.NewClosedEnvironment(function.Environment)
+	for index, identifier := range function.Parameters {
+		newEnvironment.Add(identifier.Value, args[index])
+	}
+	return newEnvironment
+}
+
+func unwrapResult(o object.Object) object.Object {
+	if returnValue, ok := o.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+	return o
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	function, ok := fn.(*object.Function)
+	if !ok {
+		return newError("not a function: %s", fn.Type())
+	}
+
+	scopedEnvironment := extendFunctionEnvironment(function, args)
+	evaluated := Eval(function.Body, scopedEnvironment)
+	return unwrapResult(evaluated)
+}
+
+func evalCallExpression(node *ast.CallExpression, environment *object.Environment) object.Object {
+	function := Eval(node.Function, environment)
+	if isError(function) {
+		return function
+	}
+
+	argumentValues := evalExpressions(node.Arguments, environment)
+	if len(argumentValues) == 1 && isError(argumentValues[0]) {
+		return argumentValues[0]
+	}
+
+	return applyFunction(function, argumentValues)
+}
+
 func Eval(node ast.Node, environment *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
@@ -220,6 +272,10 @@ func Eval(node ast.Node, environment *object.Environment) object.Object {
 		return value
 	case *ast.Identifier:
 		return evalIdentifier(node, environment)
+	case *ast.FunctionLiteral:
+		return &object.Function{Parameters: node.Parameters, Body: node.Body, Environment: environment}
+	case *ast.CallExpression:
+		return evalCallExpression(node, environment)
 	}
 
 	panic(fmt.Sprintf("Unexpected value %#v", node))

@@ -10,21 +10,21 @@
           Type: (token.TokenType) (len=8) "FUNCTION",
           Literal: (string) (len=2) "fn"
         },
-        Parameters: ([]ast.Identifier) (len=2) {
-          (ast.Identifier) {
+        Parameters: ([]*ast.Identifier) (len=2) {
+          (*ast.Identifier)({
             Token: (token.Token) {
               Type: (token.TokenType) (len=10) "IDENTIFIER",
               Literal: (string) (len=1) "x"
             },
             Value: (string) (len=1) "x"
-          },
-          (ast.Identifier) {
+          }),
+          (*ast.Identifier)({
             Token: (token.Token) {
               Type: (token.TokenType) (len=10) "IDENTIFIER",
               Literal: (string) (len=1) "y"
             },
             Value: (string) (len=1) "y"
-          }
+          })
         },
         Body: (*ast.BlockStatement)({
           Token: (token.Token) {

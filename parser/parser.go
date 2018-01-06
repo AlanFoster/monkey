@@ -223,13 +223,13 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 	return functionLiteral
 }
 
-func (p *Parser) parseFunctionParameters() []ast.Identifier {
-	identifiers := []ast.Identifier{}
+func (p *Parser) parseFunctionParameters() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
 
 	p.expectCur(token.LEFT_PAREN)
 
 	for !p.isCurToken(token.RIGHT_PAREN) {
-		identifier := ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+		identifier := &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 		identifiers = append(identifiers, identifier)
 		p.expectCur(token.IDENTIFIER)
 

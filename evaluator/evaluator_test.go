@@ -398,6 +398,22 @@ func TestErrorHandling(t *testing.T) {
 			"nonExistentVariable;",
 			"identifier not found: nonExistentVariable",
 		},
+		{
+			"5(1, 2, 3);",
+			"not a function: INTEGER",
+		},
+		{
+			"let add = 5; add(1, 2, 3);",
+			"not a function: INTEGER",
+		},
+		{
+			"let add = fn(x, y) { x + y }; add(5, true);",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
+		{
+			"let add = fn(x, y) { x + y }; add(true, 5 + true);",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
 	}
 
 	for _, test := range tests {
@@ -426,6 +442,62 @@ func TestAssignmentHandling(t *testing.T) {
 		{
 			"let a = 5; let b = a; a + b",
 			10,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertIntegerObject(t, evaluated, test.expected)
+	}
+}
+
+func TestFunctionHandling(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{
+			"let identity = fn(x) { x }; identity(5)",
+			5,
+		},
+		{
+			"let identity = fn(x) { return x }; identity(5)",
+			5,
+		},
+		{
+			"let add = fn(x, y) { x + y }; add(3, 5)",
+			8,
+		},
+		{
+			"fn(x, y) { x + y }(5, 9)",
+			14,
+		},
+		{
+			"let x = 5; let identity = fn(x) { x }; identity(8)",
+			8,
+		},
+		{
+			`
+				let newAdder = fn(x) { fn(y) { x + y }; };
+				let addTwo = newAdder(2);
+				addTwo(6)
+			`,
+			8,
+		},
+		{
+			`
+				let earlyReturn = fn(x) { if (x > 5) { return x } }
+				earlyReturn(11)
+			`,
+			11,
+		},
+		{
+			`
+				let earlyReturn = fn(x) { if (x > 5) { return x } }
+				let multipleCalls = fn(x) { earlyReturn(x); earlyReturn(x); earlyReturn(55); }
+				multipleCalls(11)
+			`,
+			55,
 		},
 	}
 

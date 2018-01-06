@@ -246,7 +246,7 @@ func (bs *BlockStatement) PrettyPrint() string {
 
 type FunctionLiteral struct {
 	Token      token.Token
-	Parameters []Identifier
+	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
