@@ -314,3 +314,36 @@ func TestIfStatementExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestReturnStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{
+			"return 5;",
+			5,
+		},
+		{
+			"return 5; 10;",
+			5,
+		},
+		{
+			"return 5; return 10;",
+			5,
+		},
+		{
+			"10; return 2; return 7",
+			2,
+		},
+		{
+			"if (10 > 5) { return 1; } return 0;",
+			1,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertIntegerObject(t, evaluated, test.expected)
+	}
+}

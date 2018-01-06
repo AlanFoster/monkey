@@ -17,6 +17,11 @@ func evalProgram(statements []ast.Statement) object.Object {
 
 	for _, statement := range statements {
 		result = Eval(statement)
+
+		// Unwrap the final result
+		if result.Type() == object.RETURN_VALUE {
+			return result.(*object.ReturnValue).Value
+		}
 	}
 
 	return result
@@ -27,6 +32,11 @@ func evalBlockStatement(statements []ast.Statement) object.Object {
 
 	for _, statement := range statements {
 		result = Eval(statement)
+
+		// Return the wrapped return value, as we may be nested in multiple block statements
+		if result.Type() == object.RETURN_VALUE {
+			return result
+		}
 	}
 
 	return result
@@ -159,6 +169,9 @@ func Eval(node ast.Node) object.Object {
 		return evalIfExpression(node)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node.Statements)
+	case *ast.ReturnStatement:
+		value := Eval(node.Value)
+		return &object.ReturnValue{Value: value}
 	}
 
 	panic(fmt.Sprintf("Unexpected value %#v", node))
