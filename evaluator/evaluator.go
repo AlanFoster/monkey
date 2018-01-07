@@ -190,19 +190,50 @@ func evalIdentifier(node *ast.Identifier, environment *object.Environment) objec
 		return value
 	}
 
+	if value, ok := builtins[node.Value]; ok {
+		return value
+	}
+
 	return newError("identifier not found: %s", node.Value)
 }
 
-func evalExpressions(expressions []ast.Expression, environment *object.Environment) []object.Object {
+func evalIndexExpression(left object.Object, index object.Object) object.Object {
+	switch {
+	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
+		array := left.(*object.Array)
+		i := index.(*object.Integer).Value
+		isIndexMissing := i < 0 || i > int64(len(array.Elements))
+
+		if isIndexMissing {
+			return NULL
+		} else {
+			return array.Elements[i]
+		}
+	default:
+		return newError("index operator not available with value %s and index %s", left.Type(), index.Type())
+	}
+}
+
+func evalArrayLiteral(node *ast.ArrayLiteral, environment *object.Environment) object.Object {
+	elements, errorObject := evalExpressions(node.Elements, environment)
+	if errorObject != nil {
+		return errorObject
+	}
+
+	return &object.Array{Elements: elements}
+}
+
+func evalExpressions(expressions []ast.Expression, environment *object.Environment) ([]object.Object, *object.Error) {
 	var args []object.Object
 	for _, argument := range expressions {
 		argumentValue := Eval(argument, environment)
 		if isError(argumentValue) {
-			return []object.Object{argumentValue}
+			return []object.Object{}, argumentValue.(*object.Error)
 		}
 		args = append(args, argumentValue)
 	}
-	return args
+
+	return args, nil
 }
 
 func extendFunctionEnvironment(function *object.Function, args []object.Object) *object.Environment {
@@ -221,14 +252,18 @@ func unwrapResult(o object.Object) object.Object {
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	function, ok := fn.(*object.Function)
-	if !ok {
+	switch fn := fn.(type) {
+	case *object.Function:
+		scopedEnvironment := extendFunctionEnvironment(fn, args)
+		evaluated := Eval(fn.Body, scopedEnvironment)
+		return unwrapResult(evaluated)
+
+	case *object.Builtin:
+		return fn.Fn(args...)
+
+	default:
 		return newError("not a function: %s", fn.Type())
 	}
-
-	scopedEnvironment := extendFunctionEnvironment(function, args)
-	evaluated := Eval(function.Body, scopedEnvironment)
-	return unwrapResult(evaluated)
 }
 
 func evalCallExpression(node *ast.CallExpression, environment *object.Environment) object.Object {
@@ -237,9 +272,9 @@ func evalCallExpression(node *ast.CallExpression, environment *object.Environmen
 		return function
 	}
 
-	argumentValues := evalExpressions(node.Arguments, environment)
-	if len(argumentValues) == 1 && isError(argumentValues[0]) {
-		return argumentValues[0]
+	argumentValues, errorObject := evalExpressions(node.Arguments, environment)
+	if errorObject != nil {
+		return errorObject
 	}
 
 	return applyFunction(function, argumentValues)
@@ -257,6 +292,20 @@ func Eval(node ast.Node, environment *object.Environment) object.Object {
 		return &object.String{Value: node.Value}
 	case *ast.Boolean:
 		return asBoolean(node.Value)
+	case *ast.ArrayLiteral:
+		return evalArrayLiteral(node, environment)
+	case *ast.IndexExpression:
+		left := Eval(node.Left, environment)
+		if isError(left) {
+			return left
+		}
+
+		index := Eval(node.Index, environment)
+		if isError(index) {
+			return index
+		}
+
+		return evalIndexExpression(left, index)
 	case *ast.PrefixExpression:
 		right := Eval(node.Right, environment)
 		if isError(right) {

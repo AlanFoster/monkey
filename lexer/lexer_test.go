@@ -22,6 +22,7 @@ func TestBasicPunctuation(t *testing.T) {
 		;
 		()
 		{}
+		[]
 	`
 
 	expectedTokens := []struct {
@@ -44,6 +45,8 @@ func TestBasicPunctuation(t *testing.T) {
 		{token.RIGHT_PAREN, ")"},
 		{token.LEFT_BRACE, "{"},
 		{token.RIGHT_BRACE, "}"},
+		{token.LEFT_BRACKET, "["},
+		{token.RIGHT_BRACKET, "]"},
 		{token.EOF, ""},
 	}
 

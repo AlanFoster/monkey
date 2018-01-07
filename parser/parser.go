@@ -20,6 +20,7 @@ const (
 	PRODUCT          // * or /
 	PREFIX           // -X or !X
 	CALL             // myFunction(x)
+	INDEX            // array[index]
 )
 
 // This particular parser does not make use of a separate left/right precedence, instead they are
@@ -34,6 +35,7 @@ var precedences = map[token.TokenType]Precedence{
 	token.SLASH:        PRODUCT,
 	token.ASTERISK:     PRODUCT,
 	token.LEFT_PAREN:   CALL,
+	token.LEFT_BRACKET: INDEX,
 }
 
 type (
@@ -73,6 +75,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LEFT_PAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.IF, p.parseIfStatement)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
+	p.registerPrefix(token.LEFT_BRACKET, p.parseArrayLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -84,6 +87,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LESS_THAN, p.parseInfixExpression)
 	p.registerInfix(token.GREATER_THAN, p.parseInfixExpression)
 	p.registerInfix(token.LEFT_PAREN, p.parseCallExpression)
+	p.registerInfix(token.LEFT_BRACKET, p.parseIndexExpression)
 
 	return p
 }
@@ -210,6 +214,38 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	return integerLiteral
 }
 
+func (p *Parser) parseArrayLiteral() ast.Expression {
+	arrayLiteral := &ast.ArrayLiteral{Token: p.curToken}
+	p.expectCur(token.LEFT_BRACKET)
+	arrayLiteral.Elements = p.parseExpressionList()
+
+	if !p.expectPeek(token.RIGHT_BRACKET) {
+		return nil
+	}
+
+	return arrayLiteral
+}
+
+func (p *Parser) parseExpressionList() []ast.Expression {
+	var expressions []ast.Expression
+
+	for !p.isCurToken(token.RIGHT_BRACKET) {
+		expression := p.parseExpression(LOWEST)
+		expressions = append(expressions, expression)
+
+		if !p.isPeekToken(token.COMMA) {
+			break
+		}
+
+		if !p.expectPeek(token.COMMA) {
+			return nil
+		}
+		p.expectCur(token.COMMA)
+	}
+
+	return expressions
+}
+
 func (p *Parser) parseFunctionLiteral() ast.Expression {
 	functionLiteral := &ast.FunctionLiteral{Token: p.curToken}
 
@@ -263,8 +299,20 @@ func (p *Parser) parseCallExpression(left ast.Expression) ast.Expression {
 	return expression
 }
 
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	indexExpression := &ast.IndexExpression{Token: p.curToken, Left: left}
+	p.expectCur(token.LEFT_BRACKET)
+	indexExpression.Index = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RIGHT_BRACKET) {
+		return nil
+	}
+
+	return indexExpression
+}
+
 func (p *Parser) parseFunctionArguments() []ast.Expression {
-	args := []ast.Expression{}
+	var args []ast.Expression
 	p.expectCur(token.LEFT_PAREN)
 
 	for !p.isCurToken(token.RIGHT_PAREN) {

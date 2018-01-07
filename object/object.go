@@ -19,6 +19,8 @@ const (
 	ERROR
 	FUNCTION
 	STRING
+	ARRAY
+	BUILTIN
 )
 
 type Object interface {
@@ -121,4 +123,40 @@ func (s *String) Type() ObjectType {
 
 func (s *String) Inspect() string {
 	return s.Value
+}
+
+type Array struct {
+	Elements []Object
+}
+
+func (a *Array) Type() ObjectType {
+	return ARRAY
+}
+
+func (a *Array) Inspect() string {
+	var out bytes.Buffer
+
+	var elements []string
+	for _, element := range a.Elements {
+		elements = append(elements, element.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
+
+type BuiltinFunction func(args ...Object) Object
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (s *Builtin) Type() ObjectType {
+	return BUILTIN
+}
+
+func (s *Builtin) Inspect() string {
+	return "Builtin"
 }

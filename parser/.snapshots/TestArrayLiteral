@@ -1,0 +1,75 @@
+(*ast.Program)({
+  Statements: ([]ast.Statement) (len=1) {
+    (*ast.LetStatement)({
+      Token: (token.Token) {
+        Type: (token.TokenType) (len=3) "LET",
+        Literal: (string) (len=3) "let"
+      },
+      Name: (*ast.Identifier)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=10) "IDENTIFIER",
+          Literal: (string) (len=1) "a"
+        },
+        Value: (string) (len=1) "a"
+      }),
+      Value: (*ast.ArrayLiteral)({
+        Token: (token.Token) {
+          Type: (token.TokenType) (len=1) "[",
+          Literal: (string) (len=1) "["
+        },
+        Elements: ([]ast.Expression) (len=3) {
+          (*ast.IntegerLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=3) "INT",
+              Literal: (string) (len=1) "1"
+            },
+            Value: (int64) 1
+          }),
+          (*ast.IntegerLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=3) "INT",
+              Literal: (string) (len=1) "2"
+            },
+            Value: (int64) 2
+          }),
+          (*ast.FunctionLiteral)({
+            Token: (token.Token) {
+              Type: (token.TokenType) (len=8) "FUNCTION",
+              Literal: (string) (len=2) "fn"
+            },
+            Parameters: ([]*ast.Identifier) (len=1) {
+              (*ast.Identifier)({
+                Token: (token.Token) {
+                  Type: (token.TokenType) (len=10) "IDENTIFIER",
+                  Literal: (string) (len=1) "x"
+                },
+                Value: (string) (len=1) "x"
+              })
+            },
+            Body: (*ast.BlockStatement)({
+              Token: (token.Token) {
+                Type: (token.TokenType) (len=1) "{",
+                Literal: (string) (len=1) "{"
+              },
+              Statements: ([]ast.Statement) (len=1) {
+                (*ast.ExpressionStatement)({
+                  Token: (token.Token) {
+                    Type: (token.TokenType) (len=10) "IDENTIFIER",
+                    Literal: (string) (len=1) "x"
+                  },
+                  Expression: (*ast.Identifier)({
+                    Token: (token.Token) {
+                      Type: (token.TokenType) (len=10) "IDENTIFIER",
+                      Literal: (string) (len=1) "x"
+                    },
+                    Value: (string) (len=1) "x"
+                  })
+                })
+              }
+            })
+          })
+        }
+      })
+    })
+  }
+})

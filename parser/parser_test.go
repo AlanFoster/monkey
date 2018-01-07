@@ -177,6 +177,26 @@ func TestOperatorPrecedence(t *testing.T) {
 			"x(1) + y(2) + z(3)",
 			"((x(1) + y(2)) + z(3))",
 		},
+		{
+			"array[0]",
+			"(array[0])",
+		},
+		{
+			"[1, 2, 3, 4]",
+			"[1, 2, 3, 4]",
+		},
+		{
+			"func(1)[0] + func(2)[1]",
+			"((func(1)[0]) + (func(2)[1]))",
+		},
+		{
+			"a * [1, 2, 3, 4][2 * 2] * 5",
+			"((a * ([1, 2, 3, 4][(2 * 2)])) * 5)",
+		},
+		{
+			"add(a * b[2], b[1], 2 * [1, 2][1])",
+			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
+		},
 	}
 
 	for _, test := range tests {
@@ -263,6 +283,19 @@ func TestStrings(t *testing.T) {
 		let a = "hello ";
 		let b = "world";
 		let c = "hello " + "world";
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}
+
+func TestArrayLiteral(t *testing.T) {
+	input := `
+		let a = [1, 2, fn(x) { x }]
 	`
 
 	l := lexer.New(input)

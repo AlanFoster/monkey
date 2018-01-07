@@ -4,9 +4,9 @@ package object
 
 import "fmt"
 
-const _ObjectType_name = "INTEGERBOOLEANNULLRETURN_VALUEERRORFUNCTIONSTRING"
+const _ObjectType_name = "INTEGERBOOLEANNULLRETURN_VALUEERRORFUNCTIONSTRINGARRAYBUILTIN"
 
-var _ObjectType_index = [...]uint8{0, 7, 14, 18, 30, 35, 43, 49}
+var _ObjectType_index = [...]uint8{0, 7, 14, 18, 30, 35, 43, 49, 54, 61}
 
 func (i ObjectType) String() string {
 	i -= 1

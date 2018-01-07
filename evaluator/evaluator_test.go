@@ -442,6 +442,10 @@ func TestErrorHandling(t *testing.T) {
 			`"hello" - " world"`,
 			"unknown operator: STRING - STRING",
 		},
+		{
+			"[1, 2, 3] + [4, 5]",
+			"unknown operator: ARRAY + ARRAY",
+		},
 	}
 
 	for _, test := range tests {
@@ -561,5 +565,98 @@ func TestStringHandling(t *testing.T) {
 	for _, test := range tests {
 		evaluated := eval(t, test.input)
 		assertStringObject(t, evaluated, test.expected)
+	}
+}
+
+func TestLenFunction(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`len("")`,
+			0,
+		},
+		{
+			`len("hello world")`,
+			11,
+		},
+		{
+			`len(1)`,
+			"argument to `len` not supported, got INTEGER",
+		},
+		{
+			`len("one", "two")`,
+			"wrong number of arguments. got=2, want=1",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		switch expected := test.expected.(type) {
+		case int:
+			assertIntegerObject(t, evaluated, int64(expected))
+		case string:
+			assertErrorObject(t, evaluated, expected)
+		}
+	}
+}
+
+func TestArrayLiterals(t *testing.T) {
+	input := "[1, 2 * 2, 3 + 4]"
+
+	evaluated := eval(t, input)
+	result, ok := evaluated.(*object.Array)
+	assert.True(t, ok)
+	if ok {
+		assertIntegerObject(t, result.Elements[0], 1)
+		assertIntegerObject(t, result.Elements[1], 4)
+		assertIntegerObject(t, result.Elements[2], 7)
+	}
+}
+
+func TestArrayExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`[1, 2, 3][0]`,
+			1,
+		},
+		{
+			`[1, 2, 3][1]`,
+			2,
+		},
+		{
+			`[1, 2, 3][2]`,
+			3,
+		},
+		{
+			`[1, 2, 3][4]`,
+			nil,
+		},
+		{
+			`[1, 2, 3][-1]`,
+			nil,
+		},
+		{
+			`let array = [1, 2, 3]; let index = 1; array[index]`,
+			2,
+		},
+		{
+			`let array = [[1, 2, [3]], 2, 3]; array[0][2][0]`,
+			3,
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		switch expected := test.expected.(type) {
+		case int:
+			assertIntegerObject(t, evaluated, int64(expected))
+		default:
+			assertNullObject(t, evaluated)
+		}
 	}
 }
