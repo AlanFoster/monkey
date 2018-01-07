@@ -18,6 +18,7 @@ const (
 	RETURN_VALUE
 	ERROR
 	FUNCTION
+	STRING
 )
 
 type Object interface {
@@ -108,4 +109,16 @@ func (f *Function) Inspect() string {
 	out.WriteString("\n}")
 
 	return out.String()
+}
+
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType {
+	return STRING
+}
+
+func (s *String) Inspect() string {
+	return s.Value
 }

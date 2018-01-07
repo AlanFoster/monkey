@@ -70,6 +70,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newCharToken(token.LEFT_BRACE, l.ch)
 	case '}':
 		tok = newCharToken(token.RIGHT_BRACE, l.ch)
+	case '"':
+		tok = newStringToken(token.STRING, l.readString())
 	case 0:
 		tok = newStringToken(token.EOF, "")
 	default:
@@ -115,6 +117,18 @@ func (l *Lexer) readTwoCharacterLiteral() string {
 	nextChar := l.ch
 
 	return string(currentChar) + string(nextChar)
+}
+
+func (l *Lexer) readString() string {
+	// We don't want the character " within our lexeme
+	l.readChar()
+	position := l.position
+
+	for l.ch != '"' && l.ch != 0 {
+		l.readChar()
+	}
+
+	return l.input[position:l.position]
 }
 
 // Skips any whitespace

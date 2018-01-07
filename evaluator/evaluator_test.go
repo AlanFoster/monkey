@@ -32,8 +32,16 @@ func assertErrorObject(t *testing.T, o object.Object, expected string) {
 	}
 }
 
+func assertStringObject(t *testing.T, o object.Object, expected string) {
+	assert.IsType(t, new(object.String), o)
+	result, ok := o.(*object.String)
+	if assert.True(t, ok) {
+		assert.Equal(t, expected, result.Value)
+	}
+}
+
 func assertNullObject(t *testing.T, o object.Object) {
-	assert.EqualValues(t, NULL, o)
+	assert.Equal(t, NULL, o)
 }
 
 func eval(t *testing.T, input string) object.Object {
@@ -171,6 +179,22 @@ func TestInfixIntegerBooleanOperatorExpressions(t *testing.T) {
 		},
 		{
 			"1 != 2;",
+			true,
+		},
+		{
+			`"hello" == "hello";`,
+			true,
+		},
+		{
+			`"hello" == " hello ";`,
+			false,
+		},
+		{
+			`"hello" != "hello";`,
+			false,
+		},
+		{
+			`"hello" != " hello ";`,
 			true,
 		},
 	}
@@ -414,6 +438,10 @@ func TestErrorHandling(t *testing.T) {
 			"let add = fn(x, y) { x + y }; add(true, 5 + true);",
 			"type mismatch: INTEGER + BOOLEAN",
 		},
+		{
+			`"hello" - " world"`,
+			"unknown operator: STRING - STRING",
+		},
 	}
 
 	for _, test := range tests {
@@ -504,5 +532,30 @@ func TestFunctionHandling(t *testing.T) {
 	for _, test := range tests {
 		evaluated := eval(t, test.input)
 		assertIntegerObject(t, evaluated, test.expected)
+	}
+}
+
+func TestStringHandling(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			`"hello world"`,
+			"hello world",
+		},
+		{
+			`let a = "hello world";`,
+			"hello world",
+		},
+		{
+			`let a = "hello "; let b = "world"; a + b + "!" + "!";`,
+			"hello world!!",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		assertStringObject(t, evaluated, test.expected)
 	}
 }

@@ -254,6 +254,21 @@ func TestIfElseStatement(t *testing.T) {
 	cupaloy.SnapshotT(t, program)
 }
 
+func TestStrings(t *testing.T) {
+	input := `
+		let a = "hello ";
+		let b = "world";
+		let c = "hello " + "world";
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	assert.Empty(t, p.Errors())
+
+	cupaloy.SnapshotT(t, program)
+}
+
 func TestFunctionLiteral(t *testing.T) {
 	input := `
 		fn(x, y) { x + y; };

@@ -137,6 +137,19 @@ func (il *IntegerLiteral) PrettyPrint() string {
 	return il.Token.Literal
 }
 
+type StringLiteral struct {
+	Token token.Token
+	Value string
+}
+
+func (sl *StringLiteral) expressionNode() { }
+func (sl *StringLiteral) TokenLiteral() string {
+	return sl.Token.Literal
+}
+func (sl *StringLiteral) PrettyPrint() string {
+	return sl.Value
+}
+
 type PrefixExpression struct {
 	Token    token.Token
 	Operator string

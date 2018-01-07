@@ -67,6 +67,9 @@ func TestAssignmentAndFunctions(t *testing.T) {
 		};
 
 		let result = add(five, ten)
+
+		let foo = "hello world";
+		let emptyString = "";
 	`
 
 	expectedTokens := []struct {
@@ -115,6 +118,20 @@ func TestAssignmentAndFunctions(t *testing.T) {
 		{token.COMMA, ","},
 		{token.IDENTIFIER, "ten"},
 		{token.RIGHT_PAREN, ")"},
+
+		// let foo = "hello world";
+		{token.LET, "let"},
+		{token.IDENTIFIER, "foo"},
+		{token.EQ, "="},
+		{token.STRING, "hello world"},
+		{token.SEMICOLON, ";"},
+
+		// let emptyString = "";
+		{token.LET, "let"},
+		{token.IDENTIFIER, "emptyString"},
+		{token.EQ, "="},
+		{token.STRING, ""},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}
