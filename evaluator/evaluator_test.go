@@ -552,6 +552,10 @@ func TestStringHandling(t *testing.T) {
 			`let a = "hello "; let b = "world"; a + b + "!" + "!";`,
 			"hello world!!",
 		},
+		{
+			`let echo = fn(x) { x }; echo("hello") + echo(" world");`,
+			"hello world",
+		},
 	}
 
 	for _, test := range tests {

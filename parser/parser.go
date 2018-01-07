@@ -281,8 +281,8 @@ func (p *Parser) parseFunctionArguments() []ast.Expression {
 		}
 	}
 
-	// Unlike the previous parseFunction implementation, we consume this right paren
-	p.expectCur(token.RIGHT_PAREN)
+	// The convention is the calling of next function consumes the next token
+	//p.expectCur(token.RIGHT_PAREN)
 
 	return args
 }
