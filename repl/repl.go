@@ -35,6 +35,9 @@ type Repl struct {
 }
 
 func (r *Repl) OutputUsage() {
+	fmt.Println("This is the monkey programming language!")
+	fmt.Println("Feel free to type in commands, for example: 1 + 2 + 3")
+
 	fmt.Fprintln(r.out, "To set the mode:")
 	fmt.Fprintln(r.out, LEX_MODE)
 	fmt.Fprintln(r.out, PARSE_MODE)

@@ -31,7 +31,13 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
-	l.skipWhitespace()
+	for {
+		l.skipWhitespace()
+		hasSkippedComments := l.skipComments()
+		if !hasSkippedComments {
+			break
+		}
+	}
 
 	switch l.ch {
 	case '=':
@@ -142,6 +148,18 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
+// Skips any comments
+func (l *Lexer) skipComments() bool {
+	if l.isComment() {
+		for l.ch != '\n' && l.ch != 0 {
+			l.readChar()
+		}
+
+		return true
+	}
+	return false
+}
+
 // Peek at the next character within the input stream without updating the position
 // of the lexer internally
 func (l *Lexer) peekChar() byte {
@@ -162,6 +180,10 @@ func newStringToken(tokenType token.TokenType, string string) token.Token {
 // A valid identifier in monkey is similar to Java, other than lack of dollar sign support
 func isIdentifierLetter(ch byte) bool {
 	return isLetter(ch) || ch == '_'
+}
+
+func (l *Lexer) isComment() bool {
+	return l.ch == '/' && l.peekChar() == '/'
 }
 
 func isLetter(ch byte) bool {

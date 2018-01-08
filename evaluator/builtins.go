@@ -1,6 +1,9 @@
 package evaluator
 
-import "github.com/alanfoster/monkey/object"
+import (
+	"github.com/alanfoster/monkey/object"
+	"fmt"
+)
 
 var builtins = map[string]*object.Builtin{
 	"len": {
@@ -16,6 +19,15 @@ var builtins = map[string]*object.Builtin{
 				return newError("argument to `len` not supported, got %s", arg.Type())
 			}
 			return nil
+		},
+	},
+	"puts": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+
+			return NULL
 		},
 	},
 }

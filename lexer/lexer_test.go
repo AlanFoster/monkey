@@ -62,8 +62,10 @@ func TestBasicPunctuation(t *testing.T) {
 
 func TestAssignmentAndFunctions(t *testing.T) {
 	input := `
+		// Comments will be ignored, and will not generate tokens
+		// This is similar to white space
 		let five = 5;
-		let ten = 10;
+		let ten = 10; 	// This includes inlined comments
 
 		let add = fn(x, y) {
 			x + y;

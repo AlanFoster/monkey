@@ -59,7 +59,7 @@ func (n *Null) Type() ObjectType {
 }
 
 func (n *Null) Inspect() string {
-	return "NULL"
+	return "null"
 }
 
 type ReturnValue struct {
