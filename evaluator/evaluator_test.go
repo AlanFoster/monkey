@@ -573,6 +573,7 @@ func TestLenFunction(t *testing.T) {
 		input    string
 		expected interface{}
 	}{
+		// String usage
 		{
 			`len("")`,
 			0,
@@ -581,9 +582,25 @@ func TestLenFunction(t *testing.T) {
 			`len("hello world")`,
 			11,
 		},
+
+		// Array Usage
+		{
+			`len([])`,
+			0,
+		},
+		{
+			`len([1, 2, 3])`,
+			3,
+		},
+
+		// Invalid Usage
 		{
 			`len(1)`,
 			"argument to `len` not supported, got INTEGER",
+		},
+		{
+			`len()`,
+			"wrong number of arguments. got=0, want=1",
 		},
 		{
 			`len("one", "two")`,

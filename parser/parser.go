@@ -219,15 +219,15 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 	p.expectCur(token.LEFT_BRACKET)
 	arrayLiteral.Elements = p.parseExpressionList()
 
-	if !p.expectPeek(token.RIGHT_BRACKET) {
-		return nil
-	}
-
 	return arrayLiteral
 }
 
 func (p *Parser) parseExpressionList() []ast.Expression {
 	var expressions []ast.Expression
+
+	if p.isCurToken(token.RIGHT_BRACKET) {
+		return expressions
+	}
 
 	for !p.isCurToken(token.RIGHT_BRACKET) {
 		expression := p.parseExpression(LOWEST)
@@ -241,6 +241,10 @@ func (p *Parser) parseExpressionList() []ast.Expression {
 			return nil
 		}
 		p.expectCur(token.COMMA)
+	}
+
+	if !p.expectPeek(token.RIGHT_BRACKET) {
+		return nil
 	}
 
 	return expressions

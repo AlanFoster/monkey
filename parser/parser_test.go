@@ -197,6 +197,14 @@ func TestOperatorPrecedence(t *testing.T) {
 			"add(a * b[2], b[1], 2 * [1, 2][1])",
 			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
 		},
+		{
+			"func([])",
+			"func([])",
+		},
+		{
+			"func([1, 2, 3])",
+			"func([1, 2, 3])",
+		},
 	}
 
 	for _, test := range tests {
@@ -304,6 +312,39 @@ func TestArrayLiteral(t *testing.T) {
 	assert.Empty(t, p.Errors())
 
 	cupaloy.SnapshotT(t, program)
+}
+
+func TestArrayLiteralArity(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedPrettyText string
+	}{
+		{
+			"[]",
+			"[]",
+		},
+		{
+			"[1]",
+			"[1]",
+		},
+		{
+			"[1, 2]",
+			"[1, 2]",
+		},
+		{
+			"[1, 2, 3]",
+			"[1, 2, 3]",
+		},
+	}
+
+	for _, test := range tests {
+		l := lexer.New(test.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		assert.Empty(t, p.Errors())
+		assert.Equal(t, test.expectedPrettyText, program.PrettyPrint())
+	}
 }
 
 func TestFunctionLiteral(t *testing.T) {
