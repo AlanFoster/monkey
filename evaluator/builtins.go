@@ -61,6 +61,29 @@ var builtins = map[string]*object.Builtin{
 			return nil
 		},
 	},
+	"rest": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.Array:
+				length := len(arg.Elements)
+				if length == 0 {
+					return NULL
+				}
+
+				newElements := make([]object.Object, length - 1, length - 1)
+				copy(newElements, arg.Elements[1:length])
+
+				return &object.Array{Elements: newElements}
+			default:
+				return newError("argument to `last` not supported, got %s", arg.Type())
+			}
+			return nil
+		},
+	},
 	"puts": {
 		Fn: func(args ...object.Object) object.Object {
 			for _, arg := range args {
