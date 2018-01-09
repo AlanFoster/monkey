@@ -630,6 +630,13 @@ func TestFirstFunction(t *testing.T) {
 			nil,
 		},
 		{
+			`first([1])`,
+			1,
+		}, {
+			`first([1, 2])`,
+			1,
+		},
+		{
 			`first([1, 2, 3])`,
 			1,
 		},
@@ -641,6 +648,54 @@ func TestFirstFunction(t *testing.T) {
 		},
 		{
 			`first()`,
+			"wrong number of arguments. got=0, want=1",
+		},
+		{
+			`first("one", "two")`,
+			"wrong number of arguments. got=2, want=1",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		switch expected := test.expected.(type) {
+		case int:
+			assertIntegerObject(t, evaluated, int64(expected))
+		case string:
+			assertErrorObject(t, evaluated, expected)
+		}
+	}
+}
+
+func TestLastFunction(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		// Array Usage
+		{
+			`last([])`,
+			nil,
+		},
+		{
+			`last([1])`,
+			1,
+		}, {
+			`last([1, 2])`,
+			2,
+		},
+		{
+			`last([1, 2, 3])`,
+			3,
+		},
+
+		// Invalid Usage
+		{
+			`last(1)`,
+			"argument to `last` not supported, got INTEGER",
+		},
+		{
+			`last()`,
 			"wrong number of arguments. got=0, want=1",
 		},
 		{
