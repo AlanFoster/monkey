@@ -776,6 +776,67 @@ func TestRestFunction(t *testing.T) {
 	}
 }
 
+func TestPushFunction(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		// Array Usage
+		{
+			`push([], 1)`,
+			&object.Array{
+				Elements: []object.Object{
+					&object.Integer{Value: 1},
+				},
+			},
+		},
+		{
+			`push([1], 2)`,
+			&object.Array{
+				Elements: []object.Object{
+					&object.Integer{Value: 1},
+					&object.Integer{Value: 2},
+				},
+			},
+		}, {
+			`push([1, 2], 3)`,
+			&object.Array{
+				Elements: []object.Object{
+					&object.Integer{Value: 1},
+					&object.Integer{Value: 2},
+					&object.Integer{Value: 3},
+				},
+			},
+		},
+
+		// Invalid Usage
+		{
+			`push(1, [1])`,
+			"first argument to `push` must be ARRAY, got INTEGER",
+		},
+		{
+			`push()`,
+			"wrong number of arguments. got=0, want=2",
+		},
+		{
+			`push("one", "two", "three")`,
+			"wrong number of arguments. got=3, want=2",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		switch expected := test.expected.(type) {
+		case []object.Null:
+			assertNullObject(t, evaluated)
+		case string:
+			assertErrorObject(t, evaluated, expected)
+		default:
+			assert.Equal(t, expected, evaluated)
+		}
+	}
+}
+
 func TestArrayLiterals(t *testing.T) {
 	input := "[1, 2 * 2, 3 + 4]"
 

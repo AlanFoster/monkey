@@ -54,7 +54,7 @@ var builtins = map[string]*object.Builtin{
 					return NULL
 				}
 
-				return arg.Elements[len(arg.Elements) - 1]
+				return arg.Elements[len(arg.Elements)-1]
 			default:
 				return newError("argument to `last` not supported, got %s", arg.Type())
 			}
@@ -74,12 +74,32 @@ var builtins = map[string]*object.Builtin{
 					return NULL
 				}
 
-				newElements := make([]object.Object, length - 1, length - 1)
+				newElements := make([]object.Object, length-1, length-1)
 				copy(newElements, arg.Elements[1:length])
 
 				return &object.Array{Elements: newElements}
 			default:
 				return newError("argument to `last` not supported, got %s", arg.Type())
+			}
+			return nil
+		},
+	},
+	"push": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got=%d, want=2", len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.Array:
+				length := len(arg.Elements)
+				newElements := make([]object.Object, length+1, length+1)
+				copy(newElements, arg.Elements)
+				newElements[length] = args[1]
+
+				return &object.Array{Elements: newElements}
+			default:
+				return newError("first argument to `push` must be %s, got %s", object.ARRAY, arg.Type())
 			}
 			return nil
 		},
