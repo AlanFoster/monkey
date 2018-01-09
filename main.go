@@ -39,8 +39,7 @@ func interpretFile(path string, out io.Writer) {
 	}
 
 	environment := object.NewEnvironment()
-	eval := evaluator.Eval(program, environment)
-	fmt.Fprintln(out, eval.Inspect())
+	evaluator.Eval(program, environment)
 }
 
 func main() {
