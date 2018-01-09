@@ -619,6 +619,47 @@ func TestLenFunction(t *testing.T) {
 	}
 }
 
+func TestFirstFunction(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		// Array Usage
+		{
+			`first([])`,
+			nil,
+		},
+		{
+			`first([1, 2, 3])`,
+			1,
+		},
+
+		// Invalid Usage
+		{
+			`first(1)`,
+			"argument to `first` not supported, got INTEGER",
+		},
+		{
+			`first()`,
+			"wrong number of arguments. got=0, want=1",
+		},
+		{
+			`first("one", "two")`,
+			"wrong number of arguments. got=2, want=1",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := eval(t, test.input)
+		switch expected := test.expected.(type) {
+		case int:
+			assertIntegerObject(t, evaluated, int64(expected))
+		case string:
+			assertErrorObject(t, evaluated, expected)
+		}
+	}
+}
+
 func TestArrayLiterals(t *testing.T) {
 	input := "[1, 2 * 2, 3 + 4]"
 
